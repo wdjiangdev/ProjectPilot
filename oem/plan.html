@@ -998,8 +998,8 @@ function renderCustomMs(){
   var lanes = state.customMs || [];
   var html = lanes.map(function(l, i){
     var dates = (l.dates || []).map(function(x, j){
-      return '<span class="cm-date" data-i="' + i + '" data-j="' + j + '"><input type="text" class="cmd date" placeholder="YYYY-MM-DD" inputmode="numeric" data-i="' + i + '" data-j="' + j + '" value="' + esc(cmDate(x)) + '">'
-        + '<input type="text" class="cmnd" data-i="' + i + '" data-j="' + j + '" value="' + esc(cmName(x)) + '" placeholder="' + esc(tr('cmDateNamePh')) + '">'
+      return '<span class="cm-date" data-i="' + i + '" data-j="' + j + '"><input type="text" class="cmnd" data-i="' + i + '" data-j="' + j + '" value="' + esc(cmName(x)) + '" placeholder="' + esc(tr('cmDateNamePh')) + '">'
+        + '<input type="text" class="cmd date" placeholder="YYYY-MM-DD" inputmode="numeric" data-i="' + i + '" data-j="' + j + '" value="' + esc(cmDate(x)) + '">'
         + '<button class="cmx" data-i="' + i + '" data-j="' + j + '">×</button></span>';
     }).join('');
     return '<div class="cm-lane' + (l.collapsed ? ' collapsed' : '') + '" data-i="' + i + '"><div class="cm-head">'
