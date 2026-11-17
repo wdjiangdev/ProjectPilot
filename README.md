@@ -24,7 +24,6 @@
 
 # 客户节点甘特图工具 v2
 
-基于 [wdjiangdev/gantt-tool](https://github.com/wdjiangdev/gantt-tool) 的优化版（原仓库保持不变）。
 
 - `index.html` 里程碑计划：选择主机厂 → 填写客户节点日期 → 自动生成甘特图（客户节点 + 阶段 + 13 项推荐任务 + 供应商节点 + 自定义任务）
 - `exec.html` 执行层计划：工作日排程、FS/SS/FF/SF 依赖、关键路径、基线、资源预警、PDF/JPG 导出，可从计划页导入并回写里程碑
