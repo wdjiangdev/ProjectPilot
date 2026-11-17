@@ -2,6 +2,7 @@
 
 ## English
 
+- 2026-11-17: README restructured: all three language sections now follow the same Disclaimer, Overview, Features and Changelog structure.
 - 2026-11-17: Added a login gate: the site requires login to access, registration needs an invite code, and a login stays valid for 30 days; admins can generate invite codes on the page.
 - 2026-11-17: Supplier node date rows now show the name first and the date second, matching the customer milestone order.
 - 2026-11-04: "Insert customer milestone" can now add custom customer nodes (name + date), inserted at the right position by date, automatically re-sorted when the date changes, and deletable.
@@ -14,6 +15,7 @@
 
 ## 中文
 
+- 2026-11-17：仓库 README 格式调整：三个语言小节统一为免责声明、产品介绍、主要功能、更新日志四段式结构
 - 2026-11-17：新增登录门禁：访问需登录，注册需邀请码，登录一次 30 天内有效；管理员可在页面内生成邀请码
 - 2026-11-17：供应商节点日期行改成名称在前、日期在后，与客户里程碑的顺序一致
 - 2026-11-04：「插入客户里程碑」可添加自定义客户节点（名称 + 日期），按日期自动插到合适位置，改日期后自动重新排位，可删除
@@ -26,6 +28,7 @@
 
 ## Deutsch
 
+- 2026-11-17: README umstrukturiert: Alle drei Sprachabschnitte folgen jetzt der gleichen Struktur mit Haftungsausschluss, Übersicht, Funktionen und Änderungsprotokoll.
 - 2026-11-17: Anmeldeschranke hinzugefügt: Die Seite erfordert eine Anmeldung, die Registrierung benötigt einen Einladungscode, eine Anmeldung bleibt 30 Tage gültig; Administratoren können Einladungscodes auf der Seite erzeugen.
 - 2026-11-17: Bei Lieferantenknoten steht jetzt der Name vor dem Datum, wie bei den Kundenmeilensteinen.
 - 2026-11-04: „Kundenmeilenstein einfügen“ kann jetzt benutzerdefinierte Kundenknoten (Name + Datum) hinzufügen, die nach Datum an der richtigen Stelle eingefügt, bei Datumsänderung automatisch neu sortiert und gelöscht werden können.
