@@ -5,9 +5,13 @@
 - Online / 在线地址 / Online: https://wdjiangdev.github.io/ProjectPilot/
 - OEM-Gantt（客户节点图 / customer milestone chart / Kundenmeilenstein-Diagramm）: https://wdjiangdev.github.io/ProjectPilot/oem/
 
+### 免责声明
+
 本工具仅供个人管理使用，由 AI 辅助开发，所有代码开源可审查；部分信息来源于互联网，如有侵权，请联系删除。
 
 ## English
+
+### Disclaimer
 
 This tool is for personal management use only and was developed with AI assistance. All code is open source and available for review. Some information is sourced from the internet; if any content infringes on your rights, please contact me and it will be removed.
 
@@ -48,6 +52,8 @@ Data is stored only in your browser and is separate from OEM-Gantt.
 数据只保存在本机浏览器，与 OEM-Gantt 互不影响。
 
 ## Deutsch
+
+### Haftungsausschluss
 
 Dieses Tool ist ausschließlich für die persönliche Nutzung bestimmt und wurde mit KI-Unterstützung entwickelt. Der gesamte Quellcode ist Open Source und einsehbar. Einige Informationen stammen aus dem Internet. Falls Inhalte Ihre Rechte verletzen, kontaktieren Sie mich bitte zur Entfernung.
 
