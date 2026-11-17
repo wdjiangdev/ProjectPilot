@@ -9,6 +9,8 @@
 
 ## English
 
+This tool is for personal management use only and was developed with AI assistance. Some information is sourced from the internet; if any content infringes on your rights, please contact me and it will be removed.
+
 A project scheduling tool (tasks, resources, progress tracking) modelled on MS Project / GanttProject. Single-page app; all data stays in your browser. UI in Chinese / English / German, with light / dark / system themes.
 
 ### Features
@@ -55,6 +57,8 @@ Data is stored only in your browser and is separate from OEM-Gantt.
 数据只保存在本机浏览器，与 OEM-Gantt 互不影响。
 
 ## Deutsch
+
+Dieses Tool ist ausschließlich für die persönliche Nutzung bestimmt und wurde mit KI-Unterstützung entwickelt. Einige Informationen stammen aus dem Internet. Falls Inhalte Ihre Rechte verletzen, kontaktieren Sie mich bitte zur Entfernung.
 
 Ein Projektplanungswerkzeug (Vorgänge, Ressourcen, Fortschrittsverfolgung) nach dem Vorbild von MS Project / GanttProject. Single-Page-App; alle Daten bleiben im Browser. Oberfläche auf Chinesisch / Englisch / Deutsch, mit hellem / dunklem / System-Design.
 
