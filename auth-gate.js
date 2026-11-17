@@ -6,7 +6,7 @@ const styles = `
 #pp-gate-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(17, 24, 39, 0.92);
+  background: #111827;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -427,10 +427,12 @@ async function handleLogout() {
   showGate();
 }
 
+let cachedCodes = [];
+
 async function loadAdminCodes() {
   try {
     const data = await apiRequest('/api/admin/codes');
-    if (data.ok) renderAdminCodes(data.codes);
+    if (data.ok) { cachedCodes = data.codes; renderAdminCodes(cachedCodes); }
   } catch {}
 }
 
@@ -469,7 +471,13 @@ async function handleGenCodes() {
       method: 'POST',
       body: JSON.stringify({ count }),
     });
-    if (data.ok) loadAdminCodes();
+    if (data.ok && data.codes) {
+      const now = Date.now();
+      const fresh = data.codes.map(code => ({ code, createdBy: '', createdAt: now, usedBy: null, usedAt: null }));
+      cachedCodes = [...fresh, ...cachedCodes];
+      renderAdminCodes(cachedCodes);
+      setTimeout(loadAdminCodes, 1500);
+    }
   } catch {}
   btn.disabled = false;
 }
