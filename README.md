@@ -30,6 +30,10 @@ A project scheduling tool (tasks, resources, progress tracking) modelled on MS P
 
 Data is stored only in your browser and is separate from OEM-Gantt.
 
+### Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for recent changes.
+
 ## 中文
 
 ### 免责声明
@@ -54,6 +58,10 @@ Data is stored only in your browser and is separate from OEM-Gantt.
 - **操作**：Ribbon 功能区、快速访问工具栏、右键菜单、撤销/重做、快捷键（F1 查看）
 
 数据只保存在本机浏览器，与 OEM-Gantt 互不影响。
+
+### 更新日志
+
+最近更新见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## Deutsch
 
@@ -80,6 +88,6 @@ Ein Projektplanungswerkzeug (Vorgänge, Ressourcen, Fortschrittsverfolgung) nach
 
 Daten werden nur im Browser gespeichert und sind von OEM-Gantt getrennt.
 
----
+### Änderungsprotokoll
 
-Change log / 更新记录 / Änderungsprotokoll：[CHANGELOG.md](CHANGELOG.md)
+Aktuelle Änderungen siehe [CHANGELOG.md](CHANGELOG.md).
