@@ -175,6 +175,24 @@ html[data-theme=dark] .pp-code-item .revoke { background: #7f1d1d; color: #fca5a
   padding: 20px;
   font-size: 14px;
 }
+#pp-user-bar .pp-bar-actions { display: contents; }
+@media (max-width: 640px) {
+  #pp-gate-overlay { padding: 16px; box-sizing: border-box; }
+  #pp-user-bar { top: 8px; right: 8px; padding: 5px 10px; font-size: 12px; gap: 6px; }
+  #pp-user-name { cursor: pointer; }
+  #pp-user-name::after { content: ' \25be'; font-size: 10px; }
+  #pp-user-bar .pp-bar-actions { display: none; }
+  #pp-user-bar.pp-expanded .pp-bar-actions {
+    display: flex; flex-direction: column; position: absolute; top: calc(100% + 6px); right: 0;
+    background: rgba(255, 255, 255, 0.98); border: 1px solid #e5e7eb; border-radius: 10px;
+    padding: 6px; gap: 6px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+  html[data-theme=dark] #pp-user-bar.pp-expanded .pp-bar-actions {
+    background: rgba(31, 41, 55, 0.98); border-color: #374151;
+  }
+  #pp-user-bar.pp-expanded .pp-bar-actions button { text-align: left; white-space: nowrap; }
+  #pp-admin-panel { width: calc(100vw - 24px); top: 48px; }
+}
 `;
 
 function injectStyles() {
@@ -237,8 +255,10 @@ function createUserBar() {
   bar.className = 'hidden';
   bar.innerHTML = `
     <span id="pp-user-name"></span>
-    <button id="pp-btn-admin" class="hidden">邀请码管理</button>
-    <button id="pp-btn-logout">退出</button>
+    <span class="pp-bar-actions">
+      <button id="pp-btn-admin" class="hidden">邀请码管理</button>
+      <button id="pp-btn-logout">退出</button>
+    </span>
   `;
   document.body.appendChild(bar);
   return bar;
@@ -513,8 +533,9 @@ function init() {
   document.getElementById('pp-form-login').addEventListener('submit', handleLogin);
   document.getElementById('pp-form-register').addEventListener('submit', handleRegister);
   document.getElementById('pp-btn-logout').addEventListener('click', handleLogout);
-  document.getElementById('pp-btn-admin').addEventListener('click', toggleAdminPanel);
+  document.getElementById('pp-btn-admin').addEventListener('click', () => { document.getElementById('pp-user-bar').classList.remove('pp-expanded'); toggleAdminPanel(); });
   document.getElementById('pp-btn-gen').addEventListener('click', handleGenCodes);
+  document.getElementById('pp-user-name').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('pp-user-bar').classList.toggle('pp-expanded'); });
 
   document.addEventListener('click', (e) => {
     const panel = document.getElementById('pp-admin-panel');
@@ -523,6 +544,8 @@ function init() {
         !panel.contains(e.target) && e.target !== adminBtn) {
       panel.classList.add('hidden');
     }
+    const bar = document.getElementById('pp-user-bar');
+    if (bar && bar.classList.contains('pp-expanded') && !bar.contains(e.target)) bar.classList.remove('pp-expanded');
   });
 
   checkSession().then(session => {
