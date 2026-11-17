@@ -5,10 +5,6 @@
 - Online / 在线地址 / Online: https://wdjiangdev.github.io/ProjectPilot/
 - OEM-Gantt（客户节点图 / customer milestone chart / Kundenmeilenstein-Diagramm）: https://wdjiangdev.github.io/ProjectPilot/oem/
 
-### 免责声明
-
-本工具仅供个人管理使用，由 AI 辅助开发，所有代码开源可审查；部分信息来源于互联网，如有侵权，请联系删除。
-
 ## English
 
 ### Disclaimer
@@ -33,6 +29,10 @@ A project scheduling tool (tasks, resources, progress tracking) modelled on MS P
 Data is stored only in your browser and is separate from OEM-Gantt.
 
 ## 中文
+
+### 免责声明
+
+本工具仅供个人管理使用，由 AI 辅助开发，所有代码开源可审查；部分信息来源于互联网，如有侵权，请联系删除。
 
 项目计划排程工具（任务、资源、进度跟踪），对标 MS Project / GanttProject。单页应用，数据保存在本机浏览器。界面语言：中文 / English / Deutsch；浅色 / 深色 / 跟随系统。
 
