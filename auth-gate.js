@@ -180,7 +180,7 @@ html[data-theme=dark] .pp-code-item .revoke { background: #7f1d1d; color: #fca5a
   #pp-gate-overlay { padding: 16px; box-sizing: border-box; }
   #pp-user-bar { top: 8px; right: 8px; padding: 5px 10px; font-size: 12px; gap: 6px; }
   #pp-user-name { cursor: pointer; }
-  #pp-user-name::after { content: ' \25be'; font-size: 10px; }
+  #pp-user-name::after { content: ' ▾'; font-size: 10px; }
   #pp-user-bar .pp-bar-actions { display: none; }
   #pp-user-bar.pp-expanded .pp-bar-actions {
     display: flex; flex-direction: column; position: absolute; top: calc(100% + 6px); right: 0;
