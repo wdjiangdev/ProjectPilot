@@ -2,6 +2,7 @@
 
 ## English
 
+- 2026-11-17: Added a login gate: the site requires login to access, registration needs an invite code, and a login stays valid for 30 days; admins can generate invite codes on the page.
 - 2026-11-17: Supplier node date rows now show the name first and the date second, matching the customer milestone order.
 - 2026-11-04: "Insert customer milestone" can now add custom customer nodes (name + date), inserted at the right position by date, automatically re-sorted when the date changes, and deletable.
 - 2026-10-27: When the browser is zoomed (125%–200%), the ribbon no longer wraps into multiple rows and squeezes the table; it scrolls horizontally instead (mouse wheel works), and dropdown menus open normally.
@@ -13,6 +14,7 @@
 
 ## 中文
 
+- 2026-11-17：新增登录门禁：访问需登录，注册需邀请码，登录一次 30 天内有效；管理员可在页面内生成邀请码
 - 2026-11-17：供应商节点日期行改成名称在前、日期在后，与客户里程碑的顺序一致
 - 2026-11-04：「插入客户里程碑」可添加自定义客户节点（名称 + 日期），按日期自动插到合适位置，改日期后自动重新排位，可删除
 - 2026-10-27：浏览器放大（125%–200%）后功能区不再折成多行挤乱表格，放不下时横向滚动（滚轮可滚），下拉菜单正常弹出
@@ -24,6 +26,7 @@
 
 ## Deutsch
 
+- 2026-11-17: Anmeldeschranke hinzugefügt: Die Seite erfordert eine Anmeldung, die Registrierung benötigt einen Einladungscode, eine Anmeldung bleibt 30 Tage gültig; Administratoren können Einladungscodes auf der Seite erzeugen.
 - 2026-11-17: Bei Lieferantenknoten steht jetzt der Name vor dem Datum, wie bei den Kundenmeilensteinen.
 - 2026-11-04: „Kundenmeilenstein einfügen“ kann jetzt benutzerdefinierte Kundenknoten (Name + Datum) hinzufügen, die nach Datum an der richtigen Stelle eingefügt, bei Datumsänderung automatisch neu sortiert und gelöscht werden können.
 - 2026-10-27: Bei Browser-Zoom (125 %–200 %) bricht der Funktionsbereich nicht mehr in mehrere Zeilen um und quetscht die Tabelle; er scrollt stattdessen horizontal (Mausrad funktioniert), und Dropdown-Menüs öffnen normal.
