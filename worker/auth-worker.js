@@ -216,15 +216,22 @@ async function handleRegister(env, body, ip) {
   if (!(await checkRateLimit(env, ip))) {
     return jsonResponse({ ok: false, error: 'Rate limit exceeded' }, 429);
   }
-  if (!validateUsername(body.username) || !validatePassword(body.password) || !validateInviteCode(body.code)) {
-    return jsonResponse({ ok: false, error: 'Invalid input' }, 400);
+  if (!validateUsername(body.username)) {
+    return jsonResponse({ ok: false, error: 'Invalid username' }, 400);
+  }
+  if (!validatePassword(body.password)) {
+    return jsonResponse({ ok: false, error: 'Invalid password' }, 400);
+  }
+  const inviteCode = typeof body.code === 'string' ? body.code.toUpperCase() : '';
+  if (!validateInviteCode(inviteCode)) {
+    return jsonResponse({ ok: false, error: 'Invalid invite code' }, 400);
   }
   const userKey = `user:${body.username}`;
   const existing = await env.AUTH.get(userKey);
   if (existing) {
     return jsonResponse({ ok: false, error: 'Username already taken' }, 400);
   }
-  const codeKey = `code:${body.code.toUpperCase()}`;
+  const codeKey = `code:${inviteCode}`;
   const codeData = await env.AUTH.get(codeKey, 'json');
   if (!codeData || codeData.usedBy) {
     return jsonResponse({ ok: false, error: 'Invalid or used invite code' }, 400);
