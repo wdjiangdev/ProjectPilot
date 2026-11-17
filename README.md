@@ -45,15 +45,6 @@ Data is stored only in your browser and is separate from OEM-Gantt.
 - **导出**：PDF / JPG（MS Project 打印样式）、XML、GanttProject .gan、CSV、Excel（.xlsx，甘特色块随日期自动变化）、JSON
 - **操作**：Ribbon 功能区、快速访问工具栏、右键菜单、撤销/重做、快捷键（F1 查看）
 
-### 最近更新
-
-- 2026-11-17：供应商节点日期行改成名称在前、日期在后，与客户里程碑的顺序一致
-- 2026-11-04：「插入客户里程碑」可添加自定义客户节点（名称 + 日期），按日期自动插到合适位置，改日期后自动重新排位，可删除
-- 2026-10-27：浏览器放大（125%–200%）后功能区不再折成多行挤乱表格，放不下时横向滚动（滚轮可滚），下拉菜单正常弹出
-- 2026-10-26：2027 年先按法定假日暂定排入中国日历（国务院通知发布后自动替换）
-- 2026-10-26：从 OEM-Gantt 带入的推荐任务按工作日计工期，遇法定假日顺延（与 OEM 页一致）
-- 2026-10-26：「文件 → 导入 → 更多」里可填写 MPP 转换服务地址（留空用默认服务器）
-
 数据只保存在本机浏览器，与 OEM-Gantt 互不影响。
 
 ## Deutsch
@@ -76,3 +67,7 @@ Ein Projektplanungswerkzeug (Vorgänge, Ressourcen, Fortschrittsverfolgung) nach
 - **Bedienung**: Menüband, Symbolleiste für den Schnellzugriff, Kontextmenü, Rückgängig/Wiederholen, Tastenkürzel (F1)
 
 Daten werden nur im Browser gespeichert und sind von OEM-Gantt getrennt.
+
+---
+
+Change log / 更新记录 / Änderungsprotokoll：[CHANGELOG.md](CHANGELOG.md)
