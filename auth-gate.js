@@ -100,7 +100,11 @@ html[data-theme=dark] .pp-error { color: #f87171; }
   border: 1px solid #e5e7eb;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   font-size: 13px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
+#pp-user-bar.dragging { cursor: grabbing; }
 html[data-theme=dark] #pp-user-bar {
   background: rgba(31, 41, 55, 0.95);
   border-color: #374151;
@@ -347,6 +351,7 @@ function hideGate(user, role) {
   if (overlay) overlay.classList.add('hidden');
   if (userBar) {
     userBar.classList.remove('hidden');
+    clampBarToViewport();
     userName.textContent = user;
     if (role === 'admin') adminBtn.classList.remove('hidden');
   }
@@ -522,12 +527,86 @@ function initTabs() {
   });
 }
 
+const BAR_POS_KEY = 'pp_bar_pos';
+let suppressBarClick = false;
+
+function clampBarToViewport() {
+  const bar = document.getElementById('pp-user-bar');
+  if (!bar || bar.classList.contains('hidden')) return;
+  const r = bar.getBoundingClientRect();
+  const left = Math.min(Math.max(r.left, 0), Math.max(window.innerWidth - r.width, 0));
+  const top = Math.min(Math.max(r.top, 0), Math.max(window.innerHeight - r.height, 0));
+  if (left !== r.left || top !== r.top) {
+    bar.style.left = left + 'px';
+    bar.style.top = top + 'px';
+    bar.style.right = 'auto';
+  }
+}
+
+function restoreBarPosition() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(BAR_POS_KEY) || 'null');
+    if (!saved) return;
+    const bar = document.getElementById('pp-user-bar');
+    bar.style.left = saved.left + 'px';
+    bar.style.top = saved.top + 'px';
+    bar.style.right = 'auto';
+  } catch (e) {}
+}
+
+function makeBarDraggable() {
+  const bar = document.getElementById('pp-user-bar');
+  let startX = 0, startY = 0, baseLeft = 0, baseTop = 0, dragging = false;
+  bar.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;
+    if (e.button !== undefined && e.button !== 0) return;
+    const r = bar.getBoundingClientRect();
+    startX = e.clientX; startY = e.clientY;
+    baseLeft = r.left; baseTop = r.top;
+    dragging = false;
+    const onMove = (ev) => {
+      const dx = ev.clientX - startX, dy = ev.clientY - startY;
+      if (!dragging && Math.hypot(dx, dy) < 5) return;
+      if (!dragging) {
+        dragging = true;
+        bar.classList.add('dragging');
+        bar.classList.remove('pp-expanded');
+      }
+      const w = bar.offsetWidth, h = bar.offsetHeight;
+      const left = Math.min(Math.max(baseLeft + dx, 0), Math.max(window.innerWidth - w, 0));
+      const top = Math.min(Math.max(baseTop + dy, 0), Math.max(window.innerHeight - h, 0));
+      bar.style.left = left + 'px';
+      bar.style.top = top + 'px';
+      bar.style.right = 'auto';
+    };
+    const onUp = () => {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      document.removeEventListener('pointercancel', onUp);
+      if (dragging) {
+        bar.classList.remove('dragging');
+        suppressBarClick = true;
+        try {
+          const r2 = bar.getBoundingClientRect();
+          localStorage.setItem(BAR_POS_KEY, JSON.stringify({ left: Math.round(r2.left), top: Math.round(r2.top) }));
+        } catch (err) {}
+      }
+    };
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+    document.addEventListener('pointercancel', onUp);
+  });
+  window.addEventListener('resize', clampBarToViewport);
+}
+
 function init() {
   if (window.self !== window.top) return; // iframe 内不建门禁/用户栏，由父页面负责
   injectStyles();
   createGateOverlay();
   createUserBar();
   createAdminPanel();
+  restoreBarPosition();
+  makeBarDraggable();
   initTabs();
 
   document.getElementById('pp-form-login').addEventListener('submit', handleLogin);
@@ -535,7 +614,7 @@ function init() {
   document.getElementById('pp-btn-logout').addEventListener('click', handleLogout);
   document.getElementById('pp-btn-admin').addEventListener('click', () => { document.getElementById('pp-user-bar').classList.remove('pp-expanded'); toggleAdminPanel(); });
   document.getElementById('pp-btn-gen').addEventListener('click', handleGenCodes);
-  document.getElementById('pp-user-name').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('pp-user-bar').classList.toggle('pp-expanded'); });
+  document.getElementById('pp-user-name').addEventListener('click', (e) => { e.stopPropagation(); if (suppressBarClick) { suppressBarClick = false; return; } document.getElementById('pp-user-bar').classList.toggle('pp-expanded'); });
 
   document.addEventListener('click', (e) => {
     const panel = document.getElementById('pp-admin-panel');
