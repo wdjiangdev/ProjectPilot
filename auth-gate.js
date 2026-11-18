@@ -175,22 +175,21 @@ html[data-theme=dark] .pp-code-item .revoke { background: #7f1d1d; color: #fca5a
   padding: 20px;
   font-size: 14px;
 }
-#pp-user-bar .pp-bar-actions { display: contents; }
+#pp-user-bar .pp-bar-actions { display: none; }
+#pp-user-name { cursor: pointer; }
+#pp-user-name::after { content: ' ▾'; font-size: 10px; }
+#pp-user-bar.pp-expanded .pp-bar-actions {
+  display: flex; flex-direction: column; position: absolute; top: calc(100% + 6px); right: 0;
+  background: rgba(255, 255, 255, 0.98); border: 1px solid #e5e7eb; border-radius: 10px;
+  padding: 6px; gap: 6px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+html[data-theme=dark] #pp-user-bar.pp-expanded .pp-bar-actions {
+  background: rgba(31, 41, 55, 0.98); border-color: #374151;
+}
+#pp-user-bar.pp-expanded .pp-bar-actions button { text-align: left; white-space: nowrap; }
 @media (max-width: 640px) {
   #pp-gate-overlay { padding: 16px; box-sizing: border-box; }
   #pp-user-bar { top: 8px; right: 8px; padding: 5px 10px; font-size: 12px; gap: 6px; }
-  #pp-user-name { cursor: pointer; }
-  #pp-user-name::after { content: ' ▾'; font-size: 10px; }
-  #pp-user-bar .pp-bar-actions { display: none; }
-  #pp-user-bar.pp-expanded .pp-bar-actions {
-    display: flex; flex-direction: column; position: absolute; top: calc(100% + 6px); right: 0;
-    background: rgba(255, 255, 255, 0.98); border: 1px solid #e5e7eb; border-radius: 10px;
-    padding: 6px; gap: 6px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  }
-  html[data-theme=dark] #pp-user-bar.pp-expanded .pp-bar-actions {
-    background: rgba(31, 41, 55, 0.98); border-color: #374151;
-  }
-  #pp-user-bar.pp-expanded .pp-bar-actions button { text-align: left; white-space: nowrap; }
   #pp-admin-panel { width: calc(100vw - 24px); top: 48px; }
 }
 `;
