@@ -523,6 +523,7 @@ function initTabs() {
 }
 
 function init() {
+  if (window.self !== window.top) return; // iframe 内不建门禁/用户栏，由父页面负责
   injectStyles();
   createGateOverlay();
   createUserBar();
