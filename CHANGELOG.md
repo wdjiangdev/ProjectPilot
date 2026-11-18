@@ -2,6 +2,7 @@
 
 ## English
 
+- 2026-11-18: The user chip at the top right is now draggable: hold it to move it anywhere, and its position is remembered across reloads and pages.
 - 2026-11-17: README restructured: all three language sections now follow the same Disclaimer, Overview, Features and Changelog structure.
 - 2026-11-17: Added a login gate: the site requires login to access, registration needs an invite code, and a login stays valid for 30 days; admins can generate invite codes on the page.
 - 2026-11-17: Supplier node date rows now show the name first and the date second, matching the customer milestone order.
@@ -15,6 +16,7 @@
 
 ## 中文
 
+- 2026-11-18：右上角的用户小圆标改成可拖动：按住可拖到任意位置，位置会自动记住，刷新或切换页面后仍在原处
 - 2026-11-17：仓库 README 格式调整：三个语言小节统一为免责声明、产品介绍、主要功能、更新日志四段式结构
 - 2026-11-17：新增登录门禁：访问需登录，注册需邀请码，登录一次 30 天内有效；管理员可在页面内生成邀请码
 - 2026-11-17：供应商节点日期行改成名称在前、日期在后，与客户里程碑的顺序一致
@@ -28,6 +30,7 @@
 
 ## Deutsch
 
+- 2026-11-18: Die Benutzer-Kachel oben rechts ist jetzt ziehbar: halten und an eine beliebige Stelle ziehen; die Position bleibt nach Neuladen und Seitenwechsel gespeichert.
 - 2026-11-17: README umstrukturiert: Alle drei Sprachabschnitte folgen jetzt der gleichen Struktur mit Haftungsausschluss, Übersicht, Funktionen und Änderungsprotokoll.
 - 2026-11-17: Anmeldeschranke hinzugefügt: Die Seite erfordert eine Anmeldung, die Registrierung benötigt einen Einladungscode, eine Anmeldung bleibt 30 Tage gültig; Administratoren können Einladungscodes auf der Seite erzeugen.
 - 2026-11-17: Bei Lieferantenknoten steht jetzt der Name vor dem Datum, wie bei den Kundenmeilensteinen.
