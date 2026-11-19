@@ -2,6 +2,7 @@
 
 ## English
 
+- 2026-11-19: Mobile: the main page now shows the task table and the Gantt chart one at a time with two tabs to switch between, full width; the ribbon starts collapsed and its tabs scroll horizontally; tapping a selected task shows an "Edit task" button that opens the edit dialog.
 - 2026-11-18: The user chip at the top right is now draggable: hold it to move it anywhere, and its position is remembered across reloads and pages.
 - 2026-11-17: README restructured: all three language sections now follow the same Disclaimer, Overview, Features and Changelog structure.
 - 2026-11-17: Added a login gate: the site requires login to access, registration needs an invite code, and a login stays valid for 30 days; admins can generate invite codes on the page.
@@ -16,6 +17,7 @@
 
 ## 中文
 
+- 2026-11-19：手机端：主页面改成任务表和甘特图两个页签，一次只显示一个、满宽切换；功能区默认收起、页签横向滑；点中一行任务后右下角出现「编辑任务」按钮，点开就是编辑弹窗
 - 2026-11-18：右上角的用户小圆标改成可拖动：按住可拖到任意位置，位置会自动记住，刷新或切换页面后仍在原处
 - 2026-11-17：仓库 README 格式调整：三个语言小节统一为免责声明、产品介绍、主要功能、更新日志四段式结构
 - 2026-11-17：新增登录门禁：访问需登录，注册需邀请码，登录一次 30 天内有效；管理员可在页面内生成邀请码
@@ -30,6 +32,7 @@
 
 ## Deutsch
 
+- 2026-11-19: Mobil: Die Hauptseite zeigt Aufgabentabelle und Gantt-Diagramm jetzt einzeln mit zwei Tabs zum Wechseln, in voller Breite; das Menüband startet eingeklappt und seine Tabs lassen sich waagerecht wischen; nach Antippen einer Aufgabe erscheint unten rechts eine Schaltfläche „Aufgabe bearbeiten", die den Bearbeitungsdialog öffnet.
 - 2026-11-18: Die Benutzer-Kachel oben rechts ist jetzt ziehbar: halten und an eine beliebige Stelle ziehen; die Position bleibt nach Neuladen und Seitenwechsel gespeichert.
 - 2026-11-17: README umstrukturiert: Alle drei Sprachabschnitte folgen jetzt der gleichen Struktur mit Haftungsausschluss, Übersicht, Funktionen und Änderungsprotokoll.
 - 2026-11-17: Anmeldeschranke hinzugefügt: Die Seite erfordert eine Anmeldung, die Registrierung benötigt einen Einladungscode, eine Anmeldung bleibt 30 Tage gültig; Administratoren können Einladungscodes auf der Seite erzeugen.

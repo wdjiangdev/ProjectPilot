@@ -352,6 +352,8 @@ body.fp-on #taskList .trow,body.fp-on .g-bar,body.fp-on .g-ms{cursor:copy!import
 #pvImg{display:block;max-width:calc(90vw - 32px);max-height:calc(85vh - 62px);border:1px solid #e5e7eb;border-radius:6px}
 .dep-line{stroke:#475569;stroke-width:1.2;fill:none;stroke-linejoin:miter}
 .dep-arr{fill:#475569}
+.mobile-tabs{display:none}
+.pp-edit-fab{display:none}
 @media(max-width:768px){.table-pane{width:300px;min-width:260px}}
 /* ===== 手机端补充适配（仅小屏生效，不改桌面端布局与配色；不动 viewport，不拦截浏览器原生缩放） ===== */
 @media (max-width:768px){
@@ -363,6 +365,22 @@ body.fp-on #taskList .trow,body.fp-on .g-bar,body.fp-on .g-ms{cursor:copy!import
   .toolbar{padding:6px 10px;gap:6px}
   header button,.toolbar button,.viewbtns button,.modal-f button,.cal-panel button{min-height:40px;min-width:40px}
   .frow input,.frow select,.frow textarea{min-height:40px}
+  /* 手机双页签：一次只显示一栏、满宽（桌面仍左右并排）；任务表横向滚动，列宽不压缩 */
+  .mobile-tabs{display:flex;background:var(--card);border-bottom:1px solid var(--line);padding:6px 10px;gap:8px;flex-shrink:0}
+  .mobile-tabs button{flex:1;min-height:40px;border:1px solid var(--line);border-radius:8px;background:#eef2f7;color:var(--tx1);font-size:13px;cursor:pointer}
+  .mobile-tabs button.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  body.m-tab-table .gantt-pane,body.m-tab-table .pane-split{display:none}
+  body.m-tab-table .table-pane{width:100% !important;min-width:0;max-width:none;overflow-x:auto}
+  /* 选中任务后右下角出现「编辑任务」悬浮按钮（行内输入框太多，点两下开弹窗在手机上够不着） */
+  .pp-edit-fab{position:fixed;right:14px;bottom:16px;z-index:80;min-height:44px;padding:0 18px;border-radius:22px;border:0;background:var(--accent);color:#fff;font-size:14px;box-shadow:0 8px 24px rgba(15,23,42,.25);cursor:pointer}
+  body.m-tab-table.m-has-sel .pp-edit-fab{display:block}
+  body.m-tab-gantt .table-pane,body.m-tab-gantt .pane-split{display:none}
+  body.m-tab-gantt .gantt-pane{flex:1;min-width:0}
+  /* 功能区页签横向滑，内容区默认收起（见 mobileTabsJs）；顶栏项目名自适应宽度 */
+  .toolbar.ribbon .rb-tabs{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .toolbar.ribbon .rb-tabs::-webkit-scrollbar{display:none}
+  .toolbar.ribbon .rb-tab{flex-shrink:0}
+  #projName{flex:1;min-width:120px;width:auto}
   /* 左侧任务表允许横向滚动（列宽不压缩，表头表体同宽同滚），甘特区横向滚动 */
   .table-pane{width:42%;min-width:0;max-width:none;overflow-x:auto}
   .table-inner{min-width:520px}
@@ -678,6 +696,11 @@ html[data-theme=dark] ::-webkit-scrollbar-thumb{background-color:rgba(255,255,25
   </div></div>
   <input type="file" id="fileJSON" accept=".json" style="display:none"> <input type="file" id="fileXML" accept=".xml" style="display:none"> <input type="file" id="fileMPP" accept=".mpp,.mpt,.mpx,.pod,.planner,.gan,.xer,.pmxml" style="display:none"> <input type="file" id="fileSub" accept=".json,.xml,.mpp,.mpt,.mpx" style="display:none">
 </div>
+<div class="mobile-tabs" id="ppMobileTabs">
+  <button type="button" data-mtab="table" class="active">任务表</button>
+  <button type="button" data-mtab="gantt">甘特图</button>
+</div>
+<button type="button" id="ppEditFab" class="pp-edit-fab">✎ 编辑任务</button>
 <div class="cal-panel" id="calPanel" style="display:none">
   <h3 data-i18n="calTitle">工作日历 · 自然语言导入</h3>
   <div class="row" style="margin-bottom:6px">
@@ -8290,6 +8313,61 @@ else init();
   document.addEventListener("wheel", function(e){ var p = e.target.closest && e.target.closest(".ribbon .rb-pane.on"); if(!p || e.target.closest(".dd-m") || p.scrollWidth <= p.clientWidth + 1 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; p.scrollLeft += e.deltaY; e.preventDefault(); closeDd(); }, { passive:false });
   document.addEventListener("scroll", function(e){ if(e.target && e.target.classList && e.target.classList.contains("rb-pane")) closeDd(); }, true);
   window.addEventListener("resize", closeDd);
+}());
+</script>
+<script id="mobileTabsJs">
+/* 手机双页签（仅 ≤768px 生效；桌面不动）：任务表 / 甘特图一次只显示一栏、满宽切换。
+   功能区默认收起（点页签可临时展开）；任务表里选中一行后右下角出现「编辑任务」按钮点开弹窗；
+   名称区点一下仍是原有行内改名。其他视图（资源/网络等）是整页 sheet，页签自动隐藏。 */
+(function(){
+  var MQ = 768, KEY = "pp-mobile-tab";
+  function isMobile(){ return window.innerWidth <= MQ; }
+  var tabs = document.getElementById("ppMobileTabs");
+  var main = document.querySelector(".main");
+  if(!tabs || !main) return;
+  var cur = "table";
+  try { var s = localStorage.getItem(KEY); if(s === "gantt" || s === "table") cur = s; } catch(e){}
+  function apply(){
+    if(!isMobile()){ document.body.classList.remove("m-tab-table","m-tab-gantt"); tabs.style.display = "none"; return; }
+    var ganttPane = main.getAttribute("data-pane") === "gantt";
+    tabs.style.display = ganttPane ? "" : "none";
+    document.body.classList.toggle("m-tab-table", ganttPane && cur === "table");
+    document.body.classList.toggle("m-tab-gantt", ganttPane && cur === "gantt");
+    tabs.querySelectorAll("button").forEach(function(b){ b.classList.toggle("active", b.dataset.mtab === cur); });
+  }
+  function setTab(t){ cur = t; try { localStorage.setItem(KEY, t); } catch(e){} apply(); }
+  tabs.addEventListener("click", function(e){ var b = e.target.closest("button[data-mtab]"); if(b) setTab(b.dataset.mtab); });
+  /* 小屏首屏折叠功能区：走现有折叠按钮（状态照常存 localStorage，与桌面共用） */
+  function foldRibbon(){
+    if(!isMobile()) return;
+    var tb = document.querySelector(".toolbar.ribbon"); if(!tb || tb.classList.contains("rb-folded")) return;
+    var f = tb.querySelector(".rb-fold"); if(f) f.click();
+  }
+  /* 任务表：点已选中的行（名称/输入框/删除/分组折叠除外）打开编辑弹窗；选中后还亮起右下角编辑按钮 */
+  var lastSel = null;
+  var list = document.getElementById("taskList");
+  var fab = document.getElementById("ppEditFab");
+  function syncSel(){ document.body.classList.toggle("m-has-sel", !!document.querySelector("#taskList .trow.sel")); }
+  if(fab) fab.addEventListener("click", function(){
+    var r = document.querySelector("#taskList .trow.sel"); if(!r) return;
+    /* 主脚本包在闭包里，openModal 不是全局：直接对行派发 dblclick，走行上原有的双击开弹窗逻辑 */
+    r.dispatchEvent(new MouseEvent("dblclick", { bubbles:true }));
+  });
+  if(list){
+    new MutationObserver(syncSel).observe(list, { childList:true, subtree:true, attributes:true, attributeFilter:["class"] });
+    syncSel();
+  }
+  if(list) list.addEventListener("click", function(e){
+    if(!isMobile()) return;
+    var r = e.target.closest && e.target.closest(".trow[data-id]"); if(!r) return;
+    var id = r.dataset.id;
+    if(id && id === lastSel && !e.target.closest(".c-name,.cell-in,.row-del,.g-tog") && !r.classList.contains("group")){ r.dispatchEvent(new MouseEvent("dblclick", { bubbles:true })); }
+    lastSel = id;
+  });
+  new MutationObserver(apply).observe(main, { attributes:true, attributeFilter:["data-pane"] });
+  window.addEventListener("resize", apply);
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ apply(); foldRibbon(); });
+  else { apply(); foldRibbon(); }
 }());
 </script>
 <script src="auth-gate.js"></script>
