@@ -187,6 +187,11 @@ body{display:flex;flex-direction:column}
 #projName{flex:0 1 220px;min-width:110px}
 #top .sp{flex:1 1 0;min-width:0}
 @media (max-width:1280px){#btnUndo [data-t],#btnRedo [data-t]{display:none}#btnUndo,#btnRedo{padding:0 9px}.oemwrap select{max-width:170px}}
+@media (max-width:700px){
+  /* 顶栏分段控件（主题/语言）与主页面一样：按钮 32px、容器 36px，刚好装下不溢出 */
+  #top .seg,#top .tabs.lang{height:36px}
+  #top .seg button,#top .tabs.lang button{height:32px;min-height:32px}
+}
 </style>
 </head>
 <body>

@@ -316,6 +316,11 @@ html[data-theme=dark] .langbtns button.on{background:#636366;color:#fff}
 html[data-theme=dark] .pv-box{background:#2c2c2e;color:var(--tx1)}html[data-theme=dark] .pv-head{color:var(--tx1)}
 html[data-theme=dark] .mobile-tabs button.active,html[data-theme=dark] .mobile-tabs button.active:hover{background:#636366;color:#fff;box-shadow:none}
 html[data-theme=dark] ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);background-clip:content-box}
+@media (max-width:768px){
+  /* 手机页签：选中态的大阴影（2px 实色描边 + 2px 扩散）会让白卡片比灰轨道大一圈、像浮起来，改成小阴影；去掉 2px 透明边框，灰底铺满整个按钮 */
+  .mobile-tabs button{border:0}
+  .mobile-tabs button.active,.mobile-tabs button.active:hover{box-shadow:0 1px 2px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.06)}
+}
 html[data-theme=dark] #projectName:focus{background:#2c2c2e}
 html[data-theme=dark] #chart rect[fill="#a0a0a0"]{fill:#3a3a3c}
 html[data-theme=dark] #chart rect[fill="#bfdbfe"]{fill:#1e3a5f}

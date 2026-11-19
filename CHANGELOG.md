@@ -2,6 +2,7 @@
 
 ## English
 
+- 2026-11-19: Mobile, OEM page: same treatment as the main page — the header theme/language segmented controls now fit inside their containers on small screens, and the two tabs (Input Data / View Gantt) no longer float above their track; the Gantt tab re-renders at full width when switching.
 - 2026-11-19: Mobile: the main page now shows the task table and the Gantt chart one at a time with two tabs to switch between, full width; the ribbon starts collapsed and its tabs scroll horizontally; tapping a selected task shows an "Edit task" button that opens the edit dialog. Also fixed: the header theme/language buttons overflowing their segmented controls on mobile, and in the Fit view the chart only filling ~270px after switching tabs with all narrow bar labels clipped — the timeline now fills the full width and task names are shown beside narrow bars.
 - 2026-11-18: The user chip at the top right is now draggable: hold it to move it anywhere, and its position is remembered across reloads and pages.
 - 2026-11-17: README restructured: all three language sections now follow the same Disclaimer, Overview, Features and Changelog structure.
@@ -17,6 +18,7 @@
 
 ## 中文
 
+- 2026-11-19：手机端 OEM 页按主页面同样标准修：顶栏主题/语言分段按钮装进容器、两个页签（填写数据/查看甘特图）不再浮起；切到甘特图时重绘满宽
 - 2026-11-19：手机端：主页面改成任务表和甘特图两个页签，一次只显示一个、满宽切换；功能区默认收起、页签横向滑；点中一行任务后右下角出现「编辑任务」按钮，点开就是编辑弹窗；另修：顶栏主题/语言分段按钮在手机上溢出成浮起的白卡片，全局视图切页签后时间轴只占约 270px、右边留白且窄任务条的名字全被截断——现在时间轴满宽、名字显示在条右侧
 - 2026-11-18：右上角的用户小圆标改成可拖动：按住可拖到任意位置，位置会自动记住，刷新或切换页面后仍在原处
 - 2026-11-17：仓库 README 格式调整：三个语言小节统一为免责声明、产品介绍、主要功能、更新日志四段式结构
@@ -32,6 +34,7 @@
 
 ## Deutsch
 
+- 2026-11-19: Mobil, OEM-Seite: gleiche Anpassung wie auf der Hauptseite – die Themen-/Sprach-Segmente in der Kopfzeile passen jetzt in ihre Container, und die beiden Tabs (Daten eingeben / Gantt ansehen) schweben nicht mehr über ihrer Leiste; beim Wechsel zum Gantt wird in voller Breite neu gezeichnet.
 - 2026-11-19: Mobil: Die Hauptseite zeigt Aufgabentabelle und Gantt-Diagramm jetzt einzeln mit zwei Tabs zum Wechseln, in voller Breite; das Menüband startet eingeklappt und seine Tabs lassen sich waagerecht wischen; nach Antippen einer Aufgabe erscheint unten rechts eine Schaltfläche „Aufgabe bearbeiten", die den Bearbeitungsdialog öffnet. Außerdem korrigiert: Die Themen-/Sprach-Schaltflächen in der Kopfzeile ragten auf dem Handy aus ihren Segmenten heraus, und in der Gesamtansicht füllte die Zeitskala nach dem Tabwechsel nur etwa 270 px aus, wobei die Namen schmaler Balken abgeschnitten wurden – jetzt füllt die Skala die volle Breite und die Namen stehen rechts neben den Balken.
 - 2026-11-18: Die Benutzer-Kachel oben rechts ist jetzt ziehbar: halten und an eine beliebige Stelle ziehen; die Position bleibt nach Neuladen und Seitenwechsel gespeichert.
 - 2026-11-17: README umstrukturiert: Alle drei Sprachabschnitte folgen jetzt der gleichen Struktur mit Haftungsausschluss, Übersicht, Funktionen und Änderungsprotokoll.
