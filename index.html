@@ -381,6 +381,13 @@ body.fp-on #taskList .trow,body.fp-on .g-bar,body.fp-on .g-ms{cursor:copy!import
   .toolbar.ribbon .rb-tabs::-webkit-scrollbar{display:none}
   .toolbar.ribbon .rb-tab{flex-shrink:0}
   #projName{flex:1;min-width:120px;width:auto}
+  /* 顶栏分段控件（主题/语言）容器只有 28px 高，按钮被手机端 40px 触摸高度撑出容器、像浮起来的白卡片：这俩分段按钮改回 32px、容器 36px，刚好装下不溢出 */
+  header #themeBtns,header .langbtns{min-height:36px}
+  header #themeBtns button,header .langbtns button{min-height:32px}
+  /* 全局（fit）视图下任务条太窄、条内名字全被截断：手机甘特页签里把名字移到条右侧显示（仅 fit 视图，日/周视图条够宽、名字仍在条内） */
+  body.m-tab-gantt.m-view-fit .g-bar{overflow:visible}
+  body.m-tab-gantt.m-view-fit .g-bar .lbl{position:absolute;left:100%;top:0;bottom:0;display:flex;align-items:center;padding:0 0 0 6px;color:#374151;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 4px #fff;white-space:nowrap}
+  html[data-theme=dark] body.m-tab-gantt.m-view-fit .g-bar .lbl{color:#e5e7eb;text-shadow:0 0 3px #111,0 0 3px #111,0 0 4px #111}
   /* 左侧任务表允许横向滚动（列宽不压缩，表头表体同宽同滚），甘特区横向滚动 */
   .table-pane{width:42%;min-width:0;max-width:none;overflow-x:auto}
   .table-inner{min-width:520px}
@@ -8335,8 +8342,16 @@ else init();
     document.body.classList.toggle("m-tab-gantt", ganttPane && cur === "gantt");
     tabs.querySelectorAll("button").forEach(function(b){ b.classList.toggle("active", b.dataset.mtab === cur); });
   }
-  function setTab(t){ cur = t; try { localStorage.setItem(KEY, t); } catch(e){} apply(); }
+  function setTab(t){ cur = t; try { localStorage.setItem(KEY, t); } catch(e){} apply(); syncViewClass();
+    /* 切到甘特图时重算一次宽度：fit 视图的缩放是在旧宽度下算的，不重算时间轴只占 270px、右边留白 */
+    if(t === "gantt") setTimeout(function(){ window.dispatchEvent(new Event("resize")); }, 0); }
   tabs.addEventListener("click", function(e){ var b = e.target.closest("button[data-mtab]"); if(b) setTab(b.dataset.mtab); });
+  /* 当前时间刻度是 fit 还是日/周：fit 才把条内名字移到条右侧 */
+  function syncViewClass(){
+    var b = document.querySelector(".viewbtns button[data-view].on");
+    document.body.classList.toggle("m-view-fit", !!b && b.dataset.view === "fit");
+  }
+  document.addEventListener("click", function(e){ if(e.target.closest && e.target.closest("button[data-view]")) setTimeout(syncViewClass, 0); });
   /* 小屏首屏折叠功能区：走现有折叠按钮（状态照常存 localStorage，与桌面共用） */
   function foldRibbon(){
     if(!isMobile()) return;
@@ -8365,9 +8380,9 @@ else init();
     lastSel = id;
   });
   new MutationObserver(apply).observe(main, { attributes:true, attributeFilter:["data-pane"] });
-  window.addEventListener("resize", apply);
-  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ apply(); foldRibbon(); });
-  else { apply(); foldRibbon(); }
+  window.addEventListener("resize", function(){ apply(); syncViewClass(); });
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ apply(); syncViewClass(); foldRibbon(); if(isMobile() && cur === "gantt") setTimeout(function(){ window.dispatchEvent(new Event("resize")); }, 0); });
+  else { apply(); syncViewClass(); foldRibbon(); if(isMobile() && cur === "gantt") setTimeout(function(){ window.dispatchEvent(new Event("resize")); }, 0); }
 }());
 </script>
 <script src="auth-gate.js"></script>
