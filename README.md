@@ -4,6 +4,7 @@
 
 - Online / 在线地址 / Online: https://wdjiangdev.github.io/ProjectPilot/
 - OEM-Gantt（客户节点图 / customer milestone chart / Kundenmeilenstein-Diagramm）: https://wdjiangdev.github.io/ProjectPilot/oem/
+- Agile（敏捷看板 / agile board / Agile-Board）: https://wdjiangdev.github.io/ProjectPilot/agile/
 
 ## English
 

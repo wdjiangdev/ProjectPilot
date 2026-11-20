@@ -470,7 +470,7 @@ html[data-theme=dark] .omBtns button{background:#1a2638!important;color:var(--tx
 .onum{color:var(--tx3);margin-right:6px;font-variant-numeric:tabular-nums;font-weight:400}
 label.v4gb{display:flex;align-items:center;gap:6px}label.v4gb select{height:24px;font-size:12px}
 /* 顶部栏控件统一高度 32px（与 v3 根页一致）（新建项目 / 项目名称 / OEM 链接 / 主题 / 语言） */
-header button,header input,header select,header a.btn,header #lnkOem,header #themeBtns{height:32px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle}
+header button,header input,header select,header a.btn,header #lnkOem,header #lnkAgile,header #themeBtns{height:32px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle}
 header input{display:inline-block}
 .toolbar #fltTxt{height:28px;box-sizing:border-box;font-size:13px;line-height:22px}.toolbar .ms-pct{height:28px;box-sizing:border-box}
 header #themeBtns{display:flex}header #themeBtns button{height:100%;padding:0 9px}
@@ -549,8 +549,8 @@ button,input,select,textarea,optgroup{font-family:inherit!important;letter-spaci
 header{background:var(--m-bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);color:var(--tx1);border-bottom:1px solid var(--line);gap:10px}
 header h1{font-size:14px;font-weight:600;letter-spacing:-.01em;color:var(--tx1)}
 header #appVer,header .sub{color:var(--tx3);opacity:1}
-header button,header a.btn,header #lnkOem,header #lnkOem *,header select{font-size:12px!important;background:var(--m-ctl);color:var(--tx1);border:.5px solid var(--m-bd);box-shadow:var(--m-sh);border-radius:7px;font-size:12px;font-weight:500;height:28px!important;padding:0 12px}
-header button:hover,header #lnkOem:hover{background:var(--m-ctl-h)}header button:active{background:var(--m-ctl-a)}
+header button,header a.btn,header #lnkOem,header #lnkOem *,header #lnkAgile,header select{font-size:12px!important;background:var(--m-ctl);color:var(--tx1);border:.5px solid var(--m-bd);box-shadow:var(--m-sh);border-radius:7px;font-size:12px;font-weight:500;height:28px!important;padding:0 12px}
+header button:hover,header #lnkOem:hover,header #lnkAgile:hover{background:var(--m-ctl-h)}header button:active{background:var(--m-ctl-a)}
 #projName{background:var(--m-seg);border:1px solid transparent;color:var(--tx1);border-radius:7px;height:28px!important;font-size:13px}
 #projName::placeholder{color:var(--tx3)}
 #projName:focus{background:var(--m-ctl);border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,122,255,.25)}
@@ -628,6 +628,7 @@ html[data-theme=dark] ::-webkit-scrollbar-thumb{background-color:rgba(255,255,25
   <input id="projName" placeholder="填写项目名称" title="项目名称：用于导出标题和文件名" autocomplete="off">
   <span class="sp"></span>
   <a id="lnkOem" href="oem/" target="_blank" rel="noopener" style="text-decoration:none;margin-right:4px">OEM-Gantt ↗</a>
+  <a id="lnkAgile" href="agile/" target="_blank" rel="noopener" title="敏捷看板（待办 / 冲刺 / 看板 / 燃尽图）" style="text-decoration:none;margin-right:4px">Agile ↗</a>
   <div class="langbtns">
     <button data-lang="zh">中文</button><button data-lang="en">EN</button><button data-lang="de">DE</button>
   </div>
@@ -7366,6 +7367,7 @@ function v4ExpPlan(){
     ["#projName", "placeholder", "Project name", "Projektname"],
     ["#projName", "title", "Project name: used for export title and file name", "Projektname: für Exporttitel und Dateiname"],
     ["#lnkOem", "text", "OEM-Gantt ↗", "OEM-Gantt ↗"],
+    ["#lnkAgile", "title", "Agile board (backlog / sprints / board / burndown)", "Agile-Board (Backlog / Sprints / Board / Burndown)"],
     ["#modeBtns", "title", "Task mode", "Vorgangsmodus"],
     ['[data-view="fit"]', "title", "Entire project (zoom to fit)", "Gesamtes Projekt (einpassen)"],
     ["#baseSel", "title", "Baseline", "Basisplan"],
@@ -8279,6 +8281,20 @@ else init();
   }
   window.__rb11 = run;
   window.addEventListener("load", function(){ setTimeout(run, 0); });
+})();
+/* 2026-11-20：敏捷页（agile/）史诗进度回写。agile 页把 {任务id: 完成%} 写到 localStorage "pp-agile-sync"，这里读入并写进对应任务的 progress */
+(function(){
+  var K = "pp-agile-sync";
+  function apply(){
+    var m = null; try{ m = JSON.parse(localStorage.getItem(K)); }catch(e){}
+    if(!m || !state || !state.tasks) return;
+    var n = 0;
+    Object.keys(m).forEach(function(id){ if(id === "_ts") return; var t = byId(id), v = Math.max(0, Math.min(100, +m[id] || 0)); if(t && t.type !== "group" && +t.progress !== v){ t.progress = v; n++; } });
+    try{ localStorage.removeItem(K); }catch(e){}
+    if(n){ save(); render(); if(typeof toast === "function") toast((typeof lang !== "undefined" && lang === "en") ? "Agile progress applied to " + n + " task(s)" : (typeof lang !== "undefined" && lang === "de") ? "Agile-Fortschritt auf " + n + " Vorgang/Vorgänge übertragen" : "已从敏捷页更新 " + n + " 个任务的完成百分比"); }
+  }
+  window.addEventListener("storage", function(e){ if(e.key === K && e.newValue) apply(); });
+  window.addEventListener("load", function(){ setTimeout(apply, 50); }); /* init() 在 DOMContentLoaded 后才 load() 数据，晚于此处 */
 })();
 })();
 

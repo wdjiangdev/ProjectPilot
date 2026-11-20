@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProjectPilot · Agile</title>
+<script>(function(){try{var p=localStorage.getItem("gantt-theme-v4")||"system";document.documentElement.dataset.theme=p==="dark"||(p==="system"&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light"}catch(e){}})()</script>
+<style>
+:root{--accent:#007aff;--tx1:#1d1d1f;--tx2:#424245;--tx3:#86868b;--bg:#f5f5f7;--card:#fff;--line:rgba(0,0,0,.12);--line2:rgba(0,0,0,.06);
+  --m-bar:rgba(246,246,248,.86);--m-ctl:#fff;--m-ctl-h:#f6f6f6;--m-ctl-a:#e9e9eb;--m-bd:rgba(0,0,0,.14);--m-sh:0 .5px 1.5px rgba(0,0,0,.1);--m-seg:rgba(0,0,0,.06);--m-hd:#f2f2f4;--m-sel:rgba(0,122,255,.12);
+  --c-epic:#8b5cf6;--c-story:#22c55e;--c-task:#3b82f6;--c-bug:#ef4444;--warn:#f59e0b}
+html[data-theme=dark]{--accent:#0a84ff;--tx1:#f5f5f7;--tx2:#d1d1d6;--tx3:#98989d;--bg:#1c1c1e;--card:#232325;--line:rgba(255,255,255,.12);--line2:rgba(255,255,255,.07);
+  --m-bar:rgba(40,40,42,.86);--m-ctl:#3a3a3c;--m-ctl-h:#444446;--m-ctl-a:#505052;--m-bd:rgba(255,255,255,.1);--m-sh:0 .5px 1px rgba(0,0,0,.4);--m-seg:rgba(255,255,255,.08);--m-hd:#2a2a2c;--m-sel:rgba(10,132,255,.28);color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Helvetica Neue","Microsoft YaHei","Noto Sans CJK SC",sans-serif;background:var(--bg);color:var(--tx1);font-size:13px;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+header{height:48px;display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--m-bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+header h1{font-size:14px;font-weight:600;white-space:nowrap}
+.sp{flex:1}
+.btn,header a.btn{background:var(--m-ctl);color:var(--tx1);border:.5px solid var(--m-bd);box-shadow:var(--m-sh);border-radius:7px;height:28px;padding:0 12px;font-size:12px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:4px;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--m-ctl-h)}.btn:active{background:var(--m-ctl-a)}
+.btn.pri{background:var(--accent);color:#fff;border-color:transparent}
+.btn.sm{height:24px;padding:0 8px;font-size:11px}
+.seg{display:inline-flex;background:var(--m-seg);border-radius:8px;padding:2px;gap:0}
+.seg button{background:transparent;border:0;height:24px;padding:0 10px;border-radius:6px;font-size:12px;color:var(--tx2);cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--m-ctl);color:var(--tx1);box-shadow:0 1px 2px rgba(0,0,0,.18)}
+#projName{height:28px;width:200px;border-radius:7px;border:1px solid transparent;background:var(--m-seg);padding:0 10px}
+#projName:focus{outline:none;border-color:var(--accent);background:var(--card)}
+.bar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.bar input[type=search],.bar select{height:28px;border-radius:7px;border:.5px solid var(--m-bd);background:var(--m-ctl);padding:0 8px}
+#ms{font-size:12px;color:var(--tx2);padding:4px 10px;border-radius:7px;background:var(--m-seg)}
+#ms b{color:var(--tx1)}#ms.late b{color:var(--c-bug)}
+main{padding:12px;overflow:auto;height:calc(100% - 48px - 45px)}
+.view{display:none}.view.on{display:block}
+/* backlog */
+.sec{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.sech{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--m-hd);border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.sech h3{font-size:13px;font-weight:600}
+.sech .meta{color:var(--tx3);font-size:12px}
+.sech .cap{font-size:12px;padding:1px 8px;border-radius:10px;background:var(--m-seg)}
+.sech .cap.over{background:rgba(239,68,68,.15);color:var(--c-bug)}
+.list{min-height:36px}
+.list.dragover{background:var(--m-sel)}
+.row{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--line2);cursor:pointer;background:var(--card)}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--m-hd)}
+.row .key{color:var(--tx3);font-size:11px;min-width:58px}
+.row .tt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row.done .tt{text-decoration:line-through;color:var(--tx3)}
+.ty{width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex:none}
+.ty.epic{background:var(--c-epic)}.ty.story{background:var(--c-story)}.ty.task{background:var(--c-task)}.ty.bug{background:var(--c-bug)}
+.pill{font-size:11px;padding:1px 7px;border-radius:9px;background:var(--m-seg);color:var(--tx2);white-space:nowrap}
+.pill.ep{background:rgba(139,92,246,.15);color:var(--c-epic)}
+.pts{min-width:22px;text-align:center;font-size:11px;font-weight:600;border-radius:9px;background:var(--m-seg);padding:1px 6px}
+.pr{font-size:11px;width:14px;text-align:center;color:var(--tx3);font-weight:700}
+.st{font-size:11px;padding:1px 7px;border-radius:9px;white-space:nowrap}
+.st.todo{background:var(--m-seg)}.st.doing{background:rgba(59,130,246,.15);color:var(--c-task)}.st.review{background:rgba(245,158,11,.18);color:#b45309}.st.done{background:rgba(34,197,94,.15);color:#15803d}
+.empty{padding:12px;color:var(--tx3);font-size:12px;text-align:center}
+/* board */
+.board{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:12px;overflow-x:auto}
+.col{background:var(--m-hd);border-radius:10px;padding:8px;min-height:300px;display:flex;flex-direction:column}
+.col h4{font-size:12px;font-weight:600;color:var(--tx2);padding:2px 4px 8px;display:flex;justify-content:space-between;text-transform:uppercase;letter-spacing:.03em}
+.col h4 .wip.over{color:var(--c-bug)}
+.col.over{box-shadow:inset 0 0 0 2px var(--c-bug)}
+.col .cards{flex:1;display:flex;flex-direction:column;gap:6px;min-height:40px;border-radius:8px}
+.col .cards.dragover{background:var(--m-sel)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;cursor:grab;box-shadow:var(--m-sh)}
+.card .tt{margin-bottom:6px;line-height:1.35}
+.card .ft{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card .who{margin-left:auto;font-size:11px;color:var(--tx3)}
+.card.dragging,.row.dragging{opacity:.4}
+/* reports & epics */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.panel h3{font-size:13px;margin-bottom:8px}
+.panel svg{width:100%;height:auto;display:block}
+.kpi{display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap}
+.kpi div{font-size:12px;color:var(--tx3)}.kpi b{display:block;font-size:18px;color:var(--tx1)}
+table.ep{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+table.ep th,table.ep td{padding:8px 10px;border-bottom:1px solid var(--line2);text-align:left;font-size:12px;vertical-align:middle}
+table.ep th{background:var(--m-hd);font-weight:600;color:var(--tx2)}
+.prog{height:6px;background:var(--m-seg);border-radius:3px;overflow:hidden;min-width:80px}
+.prog i{display:block;height:100%;background:var(--c-story)}
+table.ep a{color:var(--tx1);text-decoration:none}table.ep a:hover{color:var(--accent);text-decoration:underline}
+table.ep select{max-width:240px;height:26px;border-radius:6px;border:.5px solid var(--m-bd);background:var(--m-ctl)}
+.hint{font-size:12px;color:var(--tx3);margin:8px 2px}
+/* dialog */
+.dlg{position:fixed;inset:0;background:rgba(0,0,0,.3);display:none;align-items:center;justify-content:center;z-index:50}
+.dlg.on{display:flex}
+.dlg .box{background:var(--card);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);width:min(560px,94vw);max-height:90vh;overflow:auto;padding:16px 18px}
+.dlg h2{font-size:15px;margin-bottom:12px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--tx2)}
+.fg label.full{grid-column:1/-1}
+.fg input,.fg select,.fg textarea{height:30px;border-radius:7px;border:.5px solid var(--m-bd);background:var(--m-ctl);padding:0 8px;color:var(--tx1)}
+.fg textarea{height:80px;padding:6px 8px;resize:vertical}
+.dlg .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.dlg .acts .del{margin-right:auto;color:var(--c-bug)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(29,29,31,.88);color:#fff;padding:8px 16px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
+#toast.show{opacity:1}
+.dd{position:relative;display:inline-flex}
+.ddm{display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:200px;background:var(--card);border:.5px solid var(--m-bd);border-radius:10px;padding:5px;box-shadow:0 12px 32px rgba(0,0,0,.18);z-index:40;flex-direction:column}
+.dd.open .ddm{display:flex}
+.ddm button{background:transparent;border:0;text-align:left;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px}
+.ddm button:hover{background:var(--accent);color:#fff}
+@media (max-width:760px){
+  header{height:auto;min-height:52px;flex-wrap:wrap;padding:6px 8px}
+  header h1{display:none}
+  #projName{width:140px}
+  main{height:auto;padding:8px}
+  .board{grid-template-columns:repeat(4,80vw);scroll-snap-type:x mandatory}
+  .col{scroll-snap-align:start}
+  .grid2{grid-template-columns:1fr}
+  .row .lb,.row .ep-pill{display:none}
+  .fg{grid-template-columns:1fr}
+  #langBtns button{padding:0 7px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>ProjectPilot · Agile</h1>
+  <input id="projName" autocomplete="off">
+  <div class="seg" id="tabs">
+    <button data-v="backlog" class="on" data-t="tBacklog">待办</button><button data-v="board" data-t="tBoard">看板</button><button data-v="reports" data-t="tReports">报表</button><button data-v="epics" data-t="tEpics">史诗</button>
+  </div>
+  <span class="sp"></span>
+  <div class="dd" id="ddFile"><button class="btn" data-t="file">文件 ▾</button>
+    <div class="ddm">
+      <button data-a="expJson" data-t="expJson">导出 JSON</button>
+      <button data-a="impJson" data-t="impJson">导入 JSON</button>
+      <button data-a="expCsv" data-t="expCsv">导出 Jira CSV</button>
+      <button data-a="impCsv" data-t="impCsv">导入 Jira CSV</button>
+      <button data-a="demo" data-t="demo">载入示例</button>
+      <button data-a="clear" data-t="clear">清空</button>
+    </div>
+  </div>
+  <a class="btn" href="../" id="lnkMain">ProjectPilot ↗</a>
+  <div class="seg" id="themeBtns"><button data-th="light">☀</button><button data-th="dark">🌙</button><button data-th="system">🖥</button></div>
+  <div class="seg" id="langBtns"><button data-lang="zh">中文</button><button data-lang="en">EN</button><button data-lang="de">DE</button></div>
+</header>
+<div class="bar">
+  <button class="btn pri" id="btnNew" data-t="newItem">＋ 新建</button>
+  <input type="search" id="q" data-tp="search" placeholder="搜索">
+  <select id="fType"><option value="" data-t="allTypes">全部类型</option><option value="story" data-t="story">故事</option><option value="task" data-t="task">任务</option><option value="bug" data-t="bug">缺陷</option></select>
+  <select id="fWho"></select>
+  <span class="sp"></span>
+  <span id="ms"></span>
+</div>
+<main>
+  <section class="view on" id="v-backlog"></section>
+  <section class="view" id="v-board"></section>
+  <section class="view" id="v-reports"></section>
+  <section class="view" id="v-epics"></section>
+</main>
+
+<div class="dlg" id="dlgItem"><div class="box">
+  <h2 id="diTitle"></h2>
+  <div class="fg">
+    <label class="full"><span data-t="fTitle">标题</span><input id="iTitle"></label>
+    <label><span data-t="fType">类型</span><select id="iType"><option value="story" data-t="story">故事</option><option value="task" data-t="task">任务</option><option value="bug" data-t="bug">缺陷</option><option value="epic" data-t="epic">史诗</option></select></label>
+    <label><span data-t="fStatus">状态</span><select id="iStatus"></select></label>
+    <label><span data-t="fPts">故事点</span><select id="iPts"></select></label>
+    <label><span data-t="fPrio">优先级</span><select id="iPrio"></select></label>
+    <label><span data-t="fWho">负责人</span><input id="iWho" list="whoList"></label>
+    <label><span data-t="fSprint">冲刺</span><select id="iSprint"></select></label>
+    <label><span data-t="fEpic">所属史诗</span><select id="iEpic"></select></label>
+    <label><span data-t="fLabels">标签（逗号分隔）</span><input id="iLabels"></label>
+    <label class="full"><span data-t="fDesc">描述</span><textarea id="iDesc"></textarea></label>
+  </div>
+  <datalist id="whoList"></datalist>
+  <div class="acts"><button class="btn del" id="iDel" data-t="del">删除</button><button class="btn" data-close data-t="cancel">取消</button><button class="btn pri" id="iSave" data-t="save">保存</button></div>
+</div></div>
+
+<div class="dlg" id="dlgSprint"><div class="box">
+  <h2 id="dsTitle"></h2>
+  <div class="fg">
+    <label class="full"><span data-t="sName">名称</span><input id="sName"></label>
+    <label><span data-t="sStart">开始</span><input type="date" id="sStart"></label>
+    <label><span data-t="sLen">长度（工作日）</span><input type="number" id="sLen" min="1" max="60"></label>
+    <label><span data-t="sEnd">结束</span><input type="date" id="sEnd"></label>
+    <label><span data-t="sCap">容量（点）</span><input type="number" id="sCap" min="0"></label>
+    <label class="full"><span data-t="sGoal">冲刺目标</span><input id="sGoal"></label>
+  </div>
+  <div class="acts"><button class="btn del" id="sDel" data-t="del">删除</button><button class="btn" data-close data-t="cancel">取消</button><button class="btn pri" id="sSave" data-t="save">保存</button></div>
+</div></div>
+
+<input type="file" id="fileIn" accept=".json,.csv" hidden>
+<div id="toast"></div>
+
+<script src="../workcal.js"></script>
+<script>
+(function(){
+"use strict";
+/* ===== 存储 =====
+   pp-agile-v1       敏捷数据（与主页面 gantt-exec-v4、OEM 页互不影响）
+   pp-agile-sync     史诗 → 主页面任务的完成百分比 {taskId: pct}，主页面读取后写入自身数据
+   gantt-exec-v4     只读：主页面任务（用于史诗关联与下一个客户节点）
+   gantt-theme-v4 / gantt-lang-v4 与主页面共用的界面偏好 */
+var KEY = "pp-agile-v1", SYNC = "pp-agile-sync", MAIN = "gantt-exec-v4";
+var STATUSES = ["todo","doing","review","done"];
+var PTS = [0,1,2,3,5,8,13,21];
+var PRIOS = ["highest","high","medium","low"];
+var PICON = { highest:"⏫", high:"🔺", medium:"=", low:"🔻" };
+var TYI = { epic:"E", story:"S", task:"T", bug:"B" };
+
+var I18N = {
+ zh:{tBacklog:"待办",tBoard:"看板",tReports:"报表",tEpics:"史诗",file:"文件 ▾",expJson:"导出 JSON",impJson:"导入 JSON",expCsv:"导出 Jira CSV",impCsv:"导入 Jira CSV",demo:"载入示例",clear:"清空",
+  newItem:"＋ 新建",search:"搜索",allTypes:"全部类型",allWho:"全部负责人",story:"故事",task:"任务",bug:"缺陷",epic:"史诗",projName:"填写项目名称",
+  todo:"待办",doing:"进行中",review:"评审",done:"完成",highest:"最高",high:"高",medium:"中",low:"低",
+  fTitle:"标题",fType:"类型",fStatus:"状态",fPts:"故事点",fPrio:"优先级",fWho:"负责人",fSprint:"冲刺",fEpic:"所属史诗",fLabels:"标签（逗号分隔）",fDesc:"描述",
+  del:"删除",cancel:"取消",save:"保存",none:"—",backlog:"产品待办",newSprint:"＋ 新建冲刺",startSprint:"开始冲刺",completeSprint:"完成冲刺",editSprint:"编辑",
+  planned:"计划中",active:"进行中",closed:"已完成",pts:"点",items:"项",cap:"容量",
+  sName:"名称",sStart:"开始",sLen:"长度（工作日）",sEnd:"结束",sCap:"容量（点）",sGoal:"冲刺目标",newSprintT:"新建冲刺",editSprintT:"编辑冲刺",newItemT:"新建事项",editItemT:"编辑事项",
+  noActive:"没有进行中的冲刺。到「待办」页开始一个冲刺。",dropHere:"拖到这里",emptyBacklog:"待办为空",
+  burndown:"燃尽图",velocity:"速度",ideal:"理想",remaining:"剩余",committed:"承诺",completed:"完成",avgVel:"平均速度",sprintLeft:"剩余工作日",donePts:"已完成点数",
+  epicName:"史诗",progress:"进度",linkTask:"关联甘特任务",pushBack:"回写进度",pushAll:"全部回写",noLink:"（不关联）",noMain:"主页面还没有任务，先在 ProjectPilot 里建计划",
+  pushed:"已回写，主页面会自动更新",epicHint:"史诗的进度 = 已完成点数 ÷ 总点数，回写后成为甘特图里对应任务的完成百分比。APQP 阶段门和客户节点继续在甘特图里管理。",
+  nextMs:"下一个客户节点",daysLeft:"还有 {n} 个工作日",overdue:"已过 {n} 天",onlyOneActive:"已有进行中的冲刺，先完成它",
+  carryOver:"有 {n} 项未完成，移到：",toBacklog:"产品待办",toNext:"下一个冲刺",confirmDel:"确定删除？",confirmClear:"清空全部敏捷数据？",imported:"已导入 {n} 项",wip:"WIP 上限",
+  sprintN:"冲刺 {n}",saved:"已保存",noSprint:"（产品待办）",noEpic:"（无）",confirmDemo:"载入示例会覆盖当前数据，继续？"},
+ en:{tBacklog:"Backlog",tBoard:"Board",tReports:"Reports",tEpics:"Epics",file:"File ▾",expJson:"Export JSON",impJson:"Import JSON",expCsv:"Export Jira CSV",impCsv:"Import Jira CSV",demo:"Load sample",clear:"Clear all",
+  newItem:"＋ Create",search:"Search",allTypes:"All types",allWho:"All assignees",story:"Story",task:"Task",bug:"Bug",epic:"Epic",projName:"Project name",
+  todo:"To Do",doing:"In Progress",review:"Review",done:"Done",highest:"Highest",high:"High",medium:"Medium",low:"Low",
+  fTitle:"Summary",fType:"Type",fStatus:"Status",fPts:"Story points",fPrio:"Priority",fWho:"Assignee",fSprint:"Sprint",fEpic:"Epic",fLabels:"Labels (comma separated)",fDesc:"Description",
+  del:"Delete",cancel:"Cancel",save:"Save",none:"—",backlog:"Backlog",newSprint:"＋ Create sprint",startSprint:"Start sprint",completeSprint:"Complete sprint",editSprint:"Edit",
+  planned:"Planned",active:"Active",closed:"Closed",pts:"pts",items:"issues",cap:"Capacity",
+  sName:"Name",sStart:"Start",sLen:"Length (workdays)",sEnd:"End",sCap:"Capacity (pts)",sGoal:"Sprint goal",newSprintT:"Create sprint",editSprintT:"Edit sprint",newItemT:"Create issue",editItemT:"Edit issue",
+  noActive:"No active sprint. Start one from the Backlog.",dropHere:"Drop here",emptyBacklog:"Backlog is empty",
+  burndown:"Burndown",velocity:"Velocity",ideal:"Ideal",remaining:"Remaining",committed:"Committed",completed:"Completed",avgVel:"Avg velocity",sprintLeft:"Workdays left",donePts:"Points done",
+  epicName:"Epic",progress:"Progress",linkTask:"Linked Gantt task",pushBack:"Push progress",pushAll:"Push all",noLink:"(not linked)",noMain:"No tasks in ProjectPilot yet",
+  pushed:"Pushed; ProjectPilot updates automatically",epicHint:"Epic progress = done points ÷ total points; pushing writes it as % complete of the linked Gantt task. APQP gates and customer milestones stay in the Gantt.",
+  nextMs:"Next customer milestone",daysLeft:"{n} workdays left",overdue:"{n} days overdue",onlyOneActive:"A sprint is already active; complete it first",
+  carryOver:"{n} open issues. Move them to:",toBacklog:"Backlog",toNext:"Next sprint",confirmDel:"Delete?",confirmClear:"Clear all agile data?",imported:"Imported {n} issues",wip:"WIP limit",
+  sprintN:"Sprint {n}",saved:"Saved",noSprint:"(Backlog)",noEpic:"(none)",confirmDemo:"Loading the sample replaces current data. Continue?"},
+ de:{tBacklog:"Backlog",tBoard:"Board",tReports:"Berichte",tEpics:"Epics",file:"Datei ▾",expJson:"JSON exportieren",impJson:"JSON importieren",expCsv:"Jira-CSV exportieren",impCsv:"Jira-CSV importieren",demo:"Beispiel laden",clear:"Alles löschen",
+  newItem:"＋ Erstellen",search:"Suchen",allTypes:"Alle Typen",allWho:"Alle Bearbeiter",story:"Story",task:"Aufgabe",bug:"Fehler",epic:"Epic",projName:"Projektname",
+  todo:"Offen",doing:"In Arbeit",review:"Review",done:"Erledigt",highest:"Höchste",high:"Hoch",medium:"Mittel",low:"Niedrig",
+  fTitle:"Titel",fType:"Typ",fStatus:"Status",fPts:"Story Points",fPrio:"Priorität",fWho:"Bearbeiter",fSprint:"Sprint",fEpic:"Epic",fLabels:"Labels (kommagetrennt)",fDesc:"Beschreibung",
+  del:"Löschen",cancel:"Abbrechen",save:"Speichern",none:"—",backlog:"Backlog",newSprint:"＋ Sprint erstellen",startSprint:"Sprint starten",completeSprint:"Sprint abschließen",editSprint:"Bearbeiten",
+  planned:"Geplant",active:"Aktiv",closed:"Abgeschlossen",pts:"P.",items:"Vorgänge",cap:"Kapazität",
+  sName:"Name",sStart:"Start",sLen:"Länge (Arbeitstage)",sEnd:"Ende",sCap:"Kapazität (P.)",sGoal:"Sprintziel",newSprintT:"Sprint erstellen",editSprintT:"Sprint bearbeiten",newItemT:"Vorgang erstellen",editItemT:"Vorgang bearbeiten",
+  noActive:"Kein aktiver Sprint. Im Backlog starten.",dropHere:"Hierher ziehen",emptyBacklog:"Backlog ist leer",
+  burndown:"Burndown",velocity:"Velocity",ideal:"Ideal",remaining:"Verbleibend",committed:"Zugesagt",completed:"Erledigt",avgVel:"Ø Velocity",sprintLeft:"Arbeitstage übrig",donePts:"Erledigte Punkte",
+  epicName:"Epic",progress:"Fortschritt",linkTask:"Verknüpfter Gantt-Vorgang",pushBack:"Fortschritt übertragen",pushAll:"Alle übertragen",noLink:"(nicht verknüpft)",noMain:"Noch keine Vorgänge in ProjectPilot",
+  pushed:"Übertragen; ProjectPilot aktualisiert sich automatisch",epicHint:"Epic-Fortschritt = erledigte Punkte ÷ Gesamtpunkte; wird als % abgeschlossen in den verknüpften Gantt-Vorgang geschrieben. APQP-Gates und Kundenmeilensteine bleiben im Gantt.",
+  nextMs:"Nächster Kundenmeilenstein",daysLeft:"noch {n} Arbeitstage",overdue:"{n} Tage überfällig",onlyOneActive:"Es läuft bereits ein Sprint; erst abschließen",
+  carryOver:"{n} offene Vorgänge. Verschieben nach:",toBacklog:"Backlog",toNext:"Nächster Sprint",confirmDel:"Löschen?",confirmClear:"Alle Agile-Daten löschen?",imported:"{n} Vorgänge importiert",wip:"WIP-Limit",
+  sprintN:"Sprint {n}",saved:"Gespeichert",noSprint:"(Backlog)",noEpic:"(keins)",confirmDemo:"Das Beispiel ersetzt die aktuellen Daten. Fortfahren?"}
+};
+var lang = (function(){ try{ var v = localStorage.getItem("gantt-lang-v4"); return v === "en" || v === "de" ? v : "zh"; }catch(e){ return "zh"; } })();
+function tr(k, o){ var s = (I18N[lang] || I18N.zh)[k]; if(s == null) s = I18N.zh[k] || k; if(o) Object.keys(o).forEach(function(x){ s = s.replace("{" + x + "}", o[x]); }); return s; }
+function $(s, r){ return (r || document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]; }); }
+function toast(m){ var t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(function(){ t.classList.remove("show"); }, 1800); }
+var W = window.WORKCAL, cal = W ? W.load() : null;
+function iso(d){ return W ? W.iso(d) : d.toISOString().slice(0, 10); }
+function pd(s){ var p = String(s).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function today(){ return iso(new Date()); }
+function isWork(s){ return W ? W.isWork(s, cal) : [0,6].indexOf(pd(s).getDay()) < 0; }
+function addWork(start, n){ var d = pd(start), g = 0; while(!isWork(iso(d)) && g++ < 400) d.setDate(d.getDate() + 1); var c = 1; while(c < n && g++ < 2000){ d.setDate(d.getDate() + 1); if(isWork(iso(d))) c++; } return iso(d); }
+function workDays(a, b){ var d = pd(a), e = pd(b), n = 0, g = 0; while(d <= e && g++ < 3000){ if(isWork(iso(d))) n++; d.setDate(d.getDate() + 1); } return n; }
+function workList(a, b){ var d = pd(a), e = pd(b), out = [], g = 0; while(d <= e && g++ < 3000){ var s = iso(d); if(isWork(s)) out.push(s); d.setDate(d.getDate() + 1); } return out; }
+
+/* ===== 状态 ===== */
+var S;
+function blank(){ return { v:1, name:"", prefix:"PP", seq:0, items:[], sprints:[], wip:{ doing:0, review:0 }, sprintLen:10 }; }
+function load(){ try{ var d = JSON.parse(localStorage.getItem(KEY)); if(d && Array.isArray(d.items)){ S = Object.assign(blank(), d); return; } }catch(e){} S = blank(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast("localStorage full"); } }
+function nid(){ return "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function newItem(o){ S.seq++; return Object.assign({ id:nid(), key:S.prefix + "-" + S.seq, type:"story", title:"", desc:"", pts:0, prio:"medium", who:"", status:"todo", sprint:"", epic:"", labels:[], linkTask:"", created:today(), doneAt:"", rank:Date.now() + S.seq }, o || {}); }
+function byId(id){ return S.items.find(function(x){ return x.id === id; }); }
+function sp(id){ return S.sprints.find(function(x){ return x.id === id; }); }
+function activeSprint(){ return S.sprints.find(function(x){ return x.state === "active"; }); }
+function epics(){ return S.items.filter(function(x){ return x.type === "epic"; }); }
+function work(){ return S.items.filter(function(x){ return x.type !== "epic"; }); }
+function sumPts(list){ return list.reduce(function(a, x){ return a + (+x.pts || 0); }, 0); }
+function setStatus(it, st){ if(it.status === st) return; it.status = st; it.doneAt = st === "done" ? today() : ""; }
+
+/* ===== 过滤 ===== */
+function passes(it){
+  var q = $("#q").value.trim().toLowerCase(), ft = $("#fType").value, fw = $("#fWho").value;
+  if(ft && it.type !== ft) return false;
+  if(fw && (it.who || "") !== fw) return false;
+  if(q && (it.key + " " + it.title + " " + (it.labels || []).join(" ")).toLowerCase().indexOf(q) < 0) return false;
+  return true;
+}
+function byRank(a, b){ return (a.rank || 0) - (b.rank || 0); }
+
+/* ===== 渲染 ===== */
+var view = "backlog";
+function render(){
+  $$("#tabs button").forEach(function(b){ b.classList.toggle("on", b.dataset.v === view); });
+  $$(".view").forEach(function(v){ v.classList.toggle("on", v.id === "v-" + view); });
+  renderWho(); renderMs();
+  if(view === "backlog") renderBacklog();
+  else if(view === "board") renderBoard();
+  else if(view === "reports") renderReports();
+  else renderEpics();
+}
+function renderWho(){
+  var sel = $("#fWho"), cur = sel.value, names = {};
+  S.items.forEach(function(x){ if(x.who) names[x.who] = 1; });
+  var ks = Object.keys(names).sort();
+  sel.innerHTML = '<option value="">' + esc(tr("allWho")) + "</option>" + ks.map(function(n){ return '<option' + (n === cur ? " selected" : "") + ">" + esc(n) + "</option>"; }).join("");
+  $("#whoList").innerHTML = ks.map(function(n){ return '<option value="' + esc(n) + '">'; }).join("");
+}
+function epicName(id){ var e = byId(id); return e ? e.title : ""; }
+function rowHtml(it){
+  var ep = it.epic ? '<span class="pill ep ep-pill">' + esc(epicName(it.epic)) + "</span>" : "";
+  var lb = (it.labels || []).map(function(l){ return '<span class="pill lb">' + esc(l) + "</span>"; }).join("");
+  return '<div class="row' + (it.status === "done" ? " done" : "") + '" draggable="true" data-id="' + it.id + '">'
+    + '<span class="ty ' + it.type + '">' + TYI[it.type] + '</span><span class="key">' + esc(it.key) + '</span><span class="tt">' + esc(it.title) + "</span>"
+    + ep + lb + '<span class="st ' + it.status + '">' + esc(tr(it.status)) + '</span><span class="pr" title="' + esc(tr(it.prio)) + '">' + PICON[it.prio] + "</span>"
+    + '<span class="pill">' + esc(it.who || "—") + '</span><span class="pts">' + (it.pts || "–") + "</span></div>";
+}
+function sprintMeta(s){
+  var r = (s.start ? s.start.slice(5) + " → " + (s.end || "").slice(5) : "");
+  return r + (s.goal ? " · " + s.goal : "");
+}
+function renderBacklog(){
+  var h = "";
+  S.sprints.filter(function(s){ return s.state !== "closed"; }).forEach(function(s){
+    var its = work().filter(function(x){ return x.sprint === s.id; }).sort(byRank), pts = sumPts(its);
+    var capCls = s.cap && pts > s.cap ? " over" : "";
+    h += '<div class="sec"><div class="sech"><h3>' + esc(s.name) + '</h3><span class="pill">' + esc(tr(s.state)) + '</span><span class="meta">' + esc(sprintMeta(s)) + "</span>"
+      + '<span class="sp" style="flex:1"></span><span class="cap' + capCls + '">' + pts + (s.cap ? " / " + s.cap : "") + " " + tr("pts") + " · " + its.length + " " + tr("items") + "</span>"
+      + (s.state === "planned" ? '<button class="btn sm" data-start="' + s.id + '">' + tr("startSprint") + "</button>" : '<button class="btn sm pri" data-complete="' + s.id + '">' + tr("completeSprint") + "</button>")
+      + '<button class="btn sm" data-edits="' + s.id + '">' + tr("editSprint") + "</button></div>"
+      + '<div class="list" data-drop="' + s.id + '">' + (its.filter(passes).map(rowHtml).join("") || '<div class="empty">' + tr("dropHere") + "</div>") + "</div></div>";
+  });
+  var bl = work().filter(function(x){ return !x.sprint || (sp(x.sprint) || {}).state === "closed" && x.status !== "done"; }).sort(byRank);
+  h += '<div class="sec"><div class="sech"><h3>' + tr("backlog") + '</h3><span class="meta">' + sumPts(bl) + " " + tr("pts") + " · " + bl.length + " " + tr("items") + '</span><span style="flex:1"></span><button class="btn sm" id="btnNewSprint">' + tr("newSprint") + "</button></div>"
+    + '<div class="list" data-drop="">' + (bl.filter(passes).map(rowHtml).join("") || '<div class="empty">' + tr("emptyBacklog") + "</div>") + "</div></div>";
+  $("#v-backlog").innerHTML = h;
+}
+function renderBoard(){
+  var s = activeSprint(), el = $("#v-board");
+  if(!s){ el.innerHTML = '<div class="empty">' + tr("noActive") + "</div>"; return; }
+  var its = work().filter(function(x){ return x.sprint === s.id; }).sort(byRank);
+  var h = '<div class="sech" style="border-radius:10px;margin-bottom:10px"><h3>' + esc(s.name) + '</h3><span class="meta">' + esc(sprintMeta(s)) + '</span><span style="flex:1"></span><button class="btn sm pri" data-complete="' + s.id + '">' + tr("completeSprint") + "</button></div>";
+  h += '<div class="board">' + STATUSES.map(function(st){
+    var cs = its.filter(function(x){ return x.status === st; }), lim = (S.wip || {})[st] || 0, over = lim && cs.length > lim;
+    return '<div class="col' + (over ? " over" : "") + '"><h4><span>' + esc(tr(st)) + " · " + cs.length + "</span>"
+      + (st === "doing" || st === "review" ? '<span class="wip' + (over ? " over" : "") + '" data-wip="' + st + '" title="' + tr("wip") + '" style="cursor:pointer">' + (lim ? "≤" + lim : "WIP") + "</span>" : "<span>" + sumPts(cs) + " " + tr("pts") + "</span>") + "</h4>"
+      + '<div class="cards" data-st="' + st + '">' + cs.filter(passes).map(function(it){
+        return '<div class="card" draggable="true" data-id="' + it.id + '"><div class="tt">' + esc(it.title) + '</div><div class="ft"><span class="ty ' + it.type + '">' + TYI[it.type] + '</span><span class="key" style="font-size:11px;color:var(--tx3)">' + esc(it.key) + "</span>"
+          + (it.epic ? '<span class="pill ep">' + esc(epicName(it.epic)) + "</span>" : "") + '<span class="pr">' + PICON[it.prio] + '</span><span class="pts">' + (it.pts || "–") + '</span><span class="who">' + esc(it.who || "") + "</span></div></div>";
+      }).join("") + "</div></div>";
+  }).join("") + "</div>";
+  el.innerHTML = h;
+}
+/* 燃尽：按工作日，每天剩余 = 承诺点数 - 截至当天已完成点数 */
+function burnSvg(s){
+  var its = work().filter(function(x){ return x.sprint === s.id; });
+  var days = workList(s.start, s.end); if(!days.length) return "";
+  var total = s.committed != null && s.state !== "planned" ? Math.max(s.committed, sumPts(its)) : sumPts(its);
+  var t = today(), Wd = 560, Hd = 220, L = 34, B = 24, T = 10, R = 10, n = days.length;
+  var x = function(i){ return L + (Wd - L - R) * (n === 1 ? 0 : i / (n - 1)); }, y = function(v){ return T + (Hd - T - B) * (1 - (total ? v / total : 0)); };
+  var act = [];
+  days.forEach(function(d, i){ if(d > t && s.state !== "closed") return; var done = sumPts(its.filter(function(x){ return x.status === "done" && x.doneAt && x.doneAt <= d; })); act.push(x(i).toFixed(1) + "," + y(total - done).toFixed(1)); });
+  var grid = "", step = Math.max(1, Math.ceil(n / 8));
+  days.forEach(function(d, i){ if(i % step === 0 || i === n - 1) grid += '<text x="' + x(i) + '" y="' + (Hd - 6) + '" font-size="10" text-anchor="middle" fill="currentColor" opacity=".55">' + d.slice(5) + "</text>"; });
+  [0, .5, 1].forEach(function(f){ var v = Math.round(total * f); grid += '<line x1="' + L + '" x2="' + (Wd - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="currentColor" opacity=".1"/><text x="' + (L - 4) + '" y="' + (y(v) + 3) + '" font-size="10" text-anchor="end" fill="currentColor" opacity=".55">' + v + "</text>"; });
+  return '<svg viewBox="0 0 ' + Wd + " " + Hd + '">' + grid
+    + '<line x1="' + x(0) + '" y1="' + y(total) + '" x2="' + x(n - 1) + '" y2="' + y(0) + '" stroke="currentColor" opacity=".35" stroke-dasharray="4 4"/>'
+    + (act.length ? '<polyline fill="none" stroke="var(--accent)" stroke-width="2" points="' + act.join(" ") + '"/>' : "")
+    + '<text x="' + (Wd - R) + '" y="' + (T + 10) + '" font-size="11" text-anchor="end" fill="currentColor" opacity=".6">— ' + tr("remaining") + "   - - " + tr("ideal") + "</text></svg>";
+}
+function velSvg(){
+  var cl = S.sprints.filter(function(s){ return s.state === "closed"; }).slice(-6);
+  if(!cl.length) return '<div class="empty">—</div>';
+  var Wd = 560, Hd = 220, B = 24, T = 10, mx = 1;
+  cl.forEach(function(s){ mx = Math.max(mx, s.committed || 0, s.done || 0); });
+  var bw = Math.min(140, (Wd - 40) / cl.length), h = "";
+  cl.forEach(function(s, i){
+    var x0 = 30 + i * bw, hc = (Hd - T - B) * (s.committed || 0) / mx, hd = (Hd - T - B) * (s.done || 0) / mx;
+    h += '<rect x="' + (x0 + bw * .15) + '" y="' + (Hd - B - hc) + '" width="' + bw * .32 + '" height="' + hc + '" fill="currentColor" opacity=".2" rx="2"/>'
+      + '<rect x="' + (x0 + bw * .5) + '" y="' + (Hd - B - hd) + '" width="' + bw * .32 + '" height="' + hd + '" fill="var(--c-story)" rx="2"/>'
+      + '<text x="' + (x0 + bw / 2) + '" y="' + (Hd - 8) + '" font-size="10" text-anchor="middle" fill="currentColor" opacity=".6">' + esc(s.name) + "</text>"
+      + '<text x="' + (x0 + bw * .66) + '" y="' + (Hd - B - hd - 3) + '" font-size="10" text-anchor="middle" fill="currentColor">' + (s.done || 0) + "</text>";
+  });
+  return '<svg viewBox="0 0 ' + Wd + " " + Hd + '">' + h + '<text x="' + (Wd - 10) + '" y="14" font-size="11" text-anchor="end" fill="currentColor" opacity=".6">▮ ' + tr("committed") + "  ▮ " + tr("completed") + "</text></svg>";
+}
+function avgVel(){ var cl = S.sprints.filter(function(s){ return s.state === "closed"; }).slice(-3); return cl.length ? Math.round(cl.reduce(function(a, s){ return a + (s.done || 0); }, 0) / cl.length) : 0; }
+function renderReports(){
+  var s = activeSprint() || S.sprints.filter(function(x){ return x.state === "closed"; }).slice(-1)[0], h = '<div class="grid2">';
+  if(s){
+    var its = work().filter(function(x){ return x.sprint === s.id; }), done = sumPts(its.filter(function(x){ return x.status === "done"; }));
+    var left = s.state === "active" ? workDays(today() > s.start ? today() : s.start, s.end) : 0;
+    h += '<div class="panel"><h3>' + tr("burndown") + " · " + esc(s.name) + '</h3><div class="kpi"><div>' + tr("committed") + "<b>" + (s.committed != null ? s.committed : sumPts(its)) + "</b></div><div>" + tr("donePts") + "<b>" + done + "</b></div><div>" + tr("sprintLeft") + "<b>" + left + "</b></div></div>" + burnSvg(s) + "</div>";
+  } else h += '<div class="panel"><h3>' + tr("burndown") + '</h3><div class="empty">' + tr("noActive") + "</div></div>";
+  h += '<div class="panel"><h3>' + tr("velocity") + '</h3><div class="kpi"><div>' + tr("avgVel") + "<b>" + avgVel() + " " + tr("pts") + "</b></div></div>" + velSvg() + "</div></div>";
+  $("#v-reports").innerHTML = h;
+}
+/* ===== 与主页面的桥 ===== */
+function mainTasks(){ try{ var d = JSON.parse(localStorage.getItem(MAIN)); return d && Array.isArray(d.tasks) ? d.tasks : []; }catch(e){ return []; } }
+function epicProg(e){ var ch = work().filter(function(x){ return x.epic === e.id; }), tot = sumPts(ch), dn = sumPts(ch.filter(function(x){ return x.status === "done"; })); if(!tot){ tot = ch.length; dn = ch.filter(function(x){ return x.status === "done"; }).length; } return { pct:tot ? Math.round(dn * 100 / tot) : 0, dn:dn, tot:tot, n:ch.length }; }
+function renderEpics(){
+  var mt = mainTasks(), opts = mt.filter(function(t){ return t.name; }).map(function(t){ return { id:t.id, name:(t.type === "group" ? "▸ " : t.type === "milestone" ? "◆ " : "   ") + t.name }; });
+  var es = epics().sort(byRank);
+  var h = '<table class="ep"><thead><tr><th>' + tr("epicName") + "</th><th>" + tr("items") + "</th><th>" + tr("progress") + "</th><th>" + tr("linkTask") + '</th><th><button class="btn sm" id="btnPushAll">' + tr("pushAll") + "</button></th></tr></thead><tbody>";
+  if(!es.length) h += '<tr><td colspan="5" class="empty">—</td></tr>';
+  es.forEach(function(e){
+    var p = epicProg(e);
+    h += '<tr><td><span class="ty epic">E</span> <a href="#" data-open="' + e.id + '">' + esc(e.key + " " + e.title) + "</a></td><td>" + p.n + "</td>"
+      + '<td><div style="display:flex;align-items:center;gap:6px"><div class="prog"><i style="width:' + p.pct + '%"></i></div>' + p.pct + "% <span style=\"color:var(--tx3)\">(" + p.dn + "/" + p.tot + ")</span></div></td>"
+      + '<td>' + (opts.length ? '<select data-link="' + e.id + '"><option value="">' + esc(tr("noLink")) + "</option>" + opts.map(function(o){ return '<option value="' + esc(o.id) + '"' + (o.id === e.linkTask ? " selected" : "") + ">" + esc(o.name) + "</option>"; }).join("") + "</select>" : '<span style="color:var(--tx3)">' + tr("noMain") + "</span>") + "</td>"
+      + '<td><button class="btn sm" data-push="' + e.id + '"' + (e.linkTask ? "" : " disabled") + ">" + tr("pushBack") + "</button></td></tr>";
+  });
+  $("#v-epics").innerHTML = h + '</tbody></table><p class="hint">' + tr("epicHint") + "</p>";
+}
+function push(list){
+  var m = {}; try{ m = JSON.parse(localStorage.getItem(SYNC)) || {}; }catch(e){}
+  var n = 0; list.forEach(function(e){ if(e.linkTask){ m[e.linkTask] = epicProg(e).pct; n++; } });
+  if(!n) return;
+  m._ts = Date.now(); localStorage.setItem(SYNC, JSON.stringify(m)); toast(tr("pushed"));
+}
+function renderMs(){
+  var el = $("#ms"), t = today();
+  var ms = mainTasks().filter(function(x){ return x.type === "milestone" && x.start && /^oem:/.test(x.source || ""); }).sort(function(a, b){ return a.start < b.start ? -1 : 1; });
+  var nx = ms.find(function(x){ return x.start >= t; });
+  if(!nx){ el.style.display = "none"; return; }
+  el.style.display = ""; el.className = "";
+  el.innerHTML = tr("nextMs") + ": <b>" + esc(nx.name) + "</b> " + nx.start + " · " + tr("daysLeft", { n:Math.max(0, workDays(t, nx.start) - 1) });
+}
+
+/* ===== 对话框 ===== */
+var editing = null;
+function fillSel(sel, pairs, cur){ sel.innerHTML = pairs.map(function(p){ return '<option value="' + esc(p[0]) + '"' + (String(p[0]) === String(cur) ? " selected" : "") + ">" + esc(p[1]) + "</option>"; }).join(""); }
+function openItem(it, preset){
+  editing = it || null; var x = it || newItemDraft(preset);
+  $("#diTitle").textContent = it ? tr("editItemT") + " · " + it.key : tr("newItemT");
+  $("#iTitle").value = x.title; $("#iType").value = x.type; $("#iWho").value = x.who || ""; $("#iLabels").value = (x.labels || []).join(", "); $("#iDesc").value = x.desc || "";
+  fillSel($("#iStatus"), STATUSES.map(function(s){ return [s, tr(s)]; }), x.status);
+  fillSel($("#iPts"), PTS.map(function(p){ return [p, p || "–"]; }), x.pts || 0);
+  fillSel($("#iPrio"), PRIOS.map(function(p){ return [p, PICON[p] + " " + tr(p)]; }), x.prio);
+  fillSel($("#iSprint"), [["", tr("noSprint")]].concat(S.sprints.filter(function(s){ return s.state !== "closed" || s.id === x.sprint; }).map(function(s){ return [s.id, s.name]; })), x.sprint);
+  fillSel($("#iEpic"), [["", tr("noEpic")]].concat(epics().filter(function(e){ return !it || e.id !== it.id; }).map(function(e){ return [e.id, e.key + " " + e.title]; })), x.epic);
+  $("#iDel").style.display = it ? "" : "none";
+  $("#dlgItem").classList.add("on"); setTimeout(function(){ $("#iTitle").focus(); }, 30);
+}
+function newItemDraft(p){ return Object.assign({ title:"", type:"story", status:"todo", pts:0, prio:"medium", who:"", sprint:"", epic:"", labels:[], desc:"" }, p || {}); }
+function saveItem(){
+  var t = $("#iTitle").value.trim(); if(!t){ $("#iTitle").focus(); return; }
+  var v = { title:t, type:$("#iType").value, pts:+$("#iPts").value, prio:$("#iPrio").value, who:$("#iWho").value.trim(), sprint:$("#iSprint").value, epic:$("#iEpic").value,
+    labels:$("#iLabels").value.split(/[,，]/).map(function(s){ return s.trim(); }).filter(Boolean), desc:$("#iDesc").value };
+  if(v.type === "epic"){ v.sprint = ""; v.epic = ""; }
+  var st = $("#iStatus").value;
+  if(editing){ Object.assign(editing, v); setStatus(editing, st); }
+  else { var it = newItem(v); setStatus(it, st); S.items.push(it); }
+  save(); closeDlg(); render();
+}
+function closeDlg(){ $$(".dlg").forEach(function(d){ d.classList.remove("on"); }); }
+var editingS = null;
+function openSprint(s){
+  editingS = s || null;
+  var n = S.sprints.length + 1, last = S.sprints.filter(function(x){ return x.end; }).slice(-1)[0];
+  var start = s ? s.start : (last ? addWork(iso(new Date(pd(last.end).getTime() + 864e5)), 1) : addWork(today(), 1));
+  var len = s ? workDays(s.start, s.end) : (S.sprintLen || 10);
+  $("#dsTitle").textContent = s ? tr("editSprintT") : tr("newSprintT");
+  $("#sName").value = s ? s.name : tr("sprintN", { n:n }); $("#sStart").value = start; $("#sLen").value = len; $("#sEnd").value = s ? s.end : addWork(start, len);
+  $("#sCap").value = s ? (s.cap || "") : (avgVel() || ""); $("#sGoal").value = s ? (s.goal || "") : "";
+  $("#sDel").style.display = s && s.state === "planned" ? "" : "none";
+  $("#dlgSprint").classList.add("on");
+}
+function saveSprint(){
+  var v = { name:$("#sName").value.trim() || tr("sprintN", { n:S.sprints.length + 1 }), start:$("#sStart").value, end:$("#sEnd").value, cap:+$("#sCap").value || 0, goal:$("#sGoal").value.trim() };
+  if(!v.start || !v.end || v.end < v.start) return;
+  S.sprintLen = workDays(v.start, v.end) || S.sprintLen;
+  if(editingS) Object.assign(editingS, v); else S.sprints.push(Object.assign({ id:nid(), state:"planned" }, v));
+  save(); closeDlg(); render();
+}
+function startSprint(id){
+  if(activeSprint()){ toast(tr("onlyOneActive")); return; }
+  var s = sp(id); s.state = "active"; s.committed = sumPts(work().filter(function(x){ return x.sprint === id; })); save(); view = "board"; render();
+}
+function completeSprint(id){
+  var s = sp(id), its = work().filter(function(x){ return x.sprint === id; }), open = its.filter(function(x){ return x.status !== "done"; });
+  var next = S.sprints.find(function(x){ return x.state === "planned"; });
+  var dest = "";
+  if(open.length){
+    var msg = tr("carryOver", { n:open.length }) + "\n1 = " + tr("toBacklog") + (next ? "\n2 = " + tr("toNext") + " (" + next.name + ")" : "");
+    var a = prompt(msg, next ? "2" : "1"); if(a === null) return;
+    dest = a.trim() === "2" && next ? next.id : "";
+  }
+  s.done = sumPts(its.filter(function(x){ return x.status === "done"; })); s.state = "closed"; s.closedAt = today();
+  open.forEach(function(x){ x.sprint = dest; });
+  save(); view = "reports"; render();
+}
+
+/* ===== 拖放 ===== */
+var dragId = null;
+document.addEventListener("dragstart", function(e){ var el = e.target.closest && e.target.closest("[data-id][draggable]"); if(!el) return; dragId = el.dataset.id; el.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; try{ e.dataTransfer.setData("text/plain", dragId); }catch(x){} });
+document.addEventListener("dragend", function(e){ $$(".dragging,.dragover").forEach(function(x){ x.classList.remove("dragging", "dragover"); }); dragId = null; });
+document.addEventListener("dragover", function(e){ var z = e.target.closest && e.target.closest("[data-drop],[data-st]"); if(!z || !dragId) return; e.preventDefault(); $$(".dragover").forEach(function(x){ if(x !== z) x.classList.remove("dragover"); }); z.classList.add("dragover"); });
+document.addEventListener("drop", function(e){
+  var z = e.target.closest && e.target.closest("[data-drop],[data-st]"); if(!z || !dragId) return; e.preventDefault();
+  var it = byId(dragId); if(!it) return;
+  /* 排序：落在某行/卡片上方 → 插到它前面 */
+  var over = e.target.closest("[data-id]"), sibs;
+  if(z.hasAttribute("data-st")){ setStatus(it, z.dataset.st); sibs = work().filter(function(x){ return x.sprint === it.sprint && x.status === it.status && x.id !== it.id; }); }
+  else { it.sprint = z.dataset.drop; sibs = work().filter(function(x){ return (x.sprint || "") === it.sprint && x.id !== it.id; }); }
+  sibs.sort(byRank);
+  if(over && over.dataset.id !== it.id){ var i = sibs.findIndex(function(x){ return x.id === over.dataset.id; }); if(i >= 0){ var prev = i > 0 ? sibs[i - 1].rank : sibs[i].rank - 1000; it.rank = (prev + sibs[i].rank) / 2; } }
+  else if(sibs.length) it.rank = sibs[sibs.length - 1].rank + 1000;
+  if(z.hasAttribute("data-drop") && it.sprint && sp(it.sprint) && sp(it.sprint).state === "active" && sp(it.sprint).committed != null){ /* 冲刺中途加入的范围计入承诺 */ }
+  save(); render();
+});
+
+/* ===== 导入导出 ===== */
+function download(name, text, type){ var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type:type })); a.download = name; a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000); }
+function fname(ext){ return (S.name || "ProjectPilot-Agile").replace(/[\\/:*?"<>|]/g, "_") + "." + ext; }
+var JTYPE = { epic:"Epic", story:"Story", task:"Task", bug:"Bug" }, JST = { todo:"To Do", doing:"In Progress", review:"In Review", done:"Done" }, JPR = { highest:"Highest", high:"High", medium:"Medium", low:"Low" };
+function csvCell(v){ v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function expCsv(){
+  var rows = [["Issue key","Issue Type","Summary","Status","Priority","Assignee","Story Points","Sprint","Parent","Labels","Description","Created"]];
+  S.items.forEach(function(x){ rows.push([x.key, JTYPE[x.type], x.title, JST[x.status], JPR[x.prio], x.who, x.pts || "", (sp(x.sprint) || {}).name || "", x.epic ? (byId(x.epic) || {}).key || "" : "", (x.labels || []).join(" "), x.desc, x.created]); });
+  download(fname("csv"), "\ufeff" + rows.map(function(r){ return r.map(csvCell).join(","); }).join("\r\n"), "text/csv;charset=utf-8");
+}
+function parseCsv(t){
+  var out = [], row = [], cur = "", q = false;
+  for(var i = 0; i < t.length; i++){ var c = t[i];
+    if(q){ if(c === '"'){ if(t[i + 1] === '"'){ cur += '"'; i++; } else q = false; } else cur += c; }
+    else if(c === '"') q = true; else if(c === ","){ row.push(cur); cur = ""; } else if(c === "\n" || c === "\r"){ if(c === "\r" && t[i + 1] === "\n") i++; row.push(cur); out.push(row); row = []; cur = ""; } else cur += c; }
+  if(cur || row.length){ row.push(cur); out.push(row); }
+  return out.filter(function(r){ return r.some(function(x){ return x.trim(); }); });
+}
+function rev(map, v){ v = String(v || "").toLowerCase(); var k = Object.keys(map).find(function(k){ return map[k].toLowerCase() === v; }); return k; }
+function impCsv(text){
+  var rows = parseCsv(text.replace(/^\ufeff/, "")); if(rows.length < 2) return;
+  var hd = rows[0].map(function(h){ return h.trim().toLowerCase(); });
+  function col(){ for(var i = 0; i < arguments.length; i++){ var j = hd.indexOf(arguments[i]); if(j >= 0) return j; } return -1; }
+  var cK = col("issue key","key"), cT = col("issue type","type"), cS = col("summary","title"), cSt = col("status"), cP = col("priority"), cA = col("assignee"),
+      cPts = col("story points","custom field (story points)","story point estimate","custom field (story point estimate)"), cSp = col("sprint"), cPa = col("parent","epic link","parent id","custom field (epic link)"), cL = col("labels"), cD = col("description");
+  var keyMap = {}, made = [], spByName = {};
+  S.sprints.forEach(function(s){ spByName[s.name] = s; });
+  rows.slice(1).forEach(function(r){
+    var g = function(c){ return c >= 0 ? (r[c] || "").trim() : ""; };
+    if(!g(cS)) return;
+    var ty = rev(JTYPE, g(cT)) || (/bug/i.test(g(cT)) ? "bug" : /epic/i.test(g(cT)) ? "epic" : /task|sub/i.test(g(cT)) ? "task" : "story");
+    var st = rev(JST, g(cSt)) || (/done|closed|resolved|完成/i.test(g(cSt)) ? "done" : /progress|进行/i.test(g(cSt)) ? "doing" : /review|评审/i.test(g(cSt)) ? "review" : "todo");
+    var spName = g(cSp), sid = "";
+    if(spName){ if(!spByName[spName]){ var ns = { id:nid(), name:spName, state:"planned", start:"", end:"", cap:0, goal:"" }; S.sprints.push(ns); spByName[spName] = ns; } sid = spByName[spName].id; }
+    var it = newItem({ type:ty, title:g(cS), status:st, prio:rev(JPR, g(cP)) || "medium", who:g(cA), pts:+g(cPts) || 0, sprint:ty === "epic" ? "" : sid, labels:g(cL) ? g(cL).split(/\s+/) : [], desc:g(cD), doneAt:st === "done" ? today() : "" });
+    if(g(cK)) keyMap[g(cK)] = it;
+    it._parent = g(cPa); made.push(it); S.items.push(it);
+  });
+  made.forEach(function(it){ if(it._parent && keyMap[it._parent] && keyMap[it._parent].type === "epic") it.epic = keyMap[it._parent].id; delete it._parent; });
+  /* 导入的冲刺没有日期：按顺序补上工作日日期 */
+  S.sprints.forEach(function(s){ if(!s.start){ var last = S.sprints.filter(function(x){ return x.end; }).slice(-1)[0]; s.start = last ? addWork(iso(new Date(pd(last.end).getTime() + 864e5)), 1) : addWork(today(), 1); s.end = addWork(s.start, S.sprintLen || 10); } });
+  save(); render(); toast(tr("imported", { n:made.length }));
+}
+function demo(){
+  S = blank(); S.name = $("#projName").value || "Demo";
+  var t0 = today(), s1 = { id:nid(), name:tr("sprintN", { n:1 }), state:"closed", start:addWork(iso(new Date(Date.now() - 20 * 864e5)), 1), end:"", cap:20, goal:"" };
+  s1.end = addWork(s1.start, 10);
+  var s2 = { id:nid(), name:tr("sprintN", { n:2 }), state:"active", start:addWork(iso(new Date(pd(s1.end).getTime() + 864e5)), 1), end:"", cap:20, goal:"ECU 通讯与诊断" };
+  s2.end = addWork(s2.start, 10);
+  var s3 = { id:nid(), name:tr("sprintN", { n:3 }), state:"planned", start:addWork(iso(new Date(pd(s2.end).getTime() + 864e5)), 1), end:"", cap:20, goal:"" };
+  s3.end = addWork(s3.start, 10);
+  S.sprints = [s1, s2, s3];
+  var e1 = newItem({ type:"epic", title:"CAN 通讯栈" }), e2 = newItem({ type:"epic", title:"UDS 诊断" }), e3 = newItem({ type:"epic", title:"标定与 EOL" });
+  S.items.push(e1, e2, e3);
+  [["CAN 报文矩阵导入", 3, "done", s1, e1, "张工"], ["CAN 驱动初始化", 5, "done", s1, e1, "李工"], ["网络管理 NM 状态机", 8, "done", s1, e1, "张工"], ["Bus-off 恢复缺陷", 2, "done", s1, e1, "李工", "bug"],
+   ["UDS 0x10/0x11 会话与复位", 5, "done", s2, e2, "王工"], ["UDS 0x22/0x2E 读写 DID", 5, "doing", s2, e2, "王工"], ["DTC 存储与老化", 8, "review", s2, e2, "李工"], ["安全访问 0x27 种子算法", 3, "todo", s2, e2, "张工"],
+   ["Bootloader 刷写流程", 8, "todo", s3, e2, ""], ["XCP 标定接口", 5, "todo", s3, e3, ""], ["EOL 下线配置写入", 5, "todo", "", e3, ""], ["HIL 自动化回归", 3, "todo", "", "", "", "task"]
+  ].forEach(function(r){ var st = r[2]; S.items.push(newItem({ title:r[0], pts:r[1], status:st, sprint:r[3] ? r[3].id : "", epic:r[4] ? r[4].id : "", who:r[5], type:r[6] || "story", doneAt:st === "done" ? (r[3] === s1 ? s1.end : addWork(s2.start, 3)) : "" })); });
+  s1.committed = 18; s1.done = 18; s2.committed = 21;
+  save(); render();
+}
+
+/* ===== 文案、主题、事件 ===== */
+function applyLang(){
+  document.documentElement.lang = lang;
+  $$("[data-t]").forEach(function(el){ el.textContent = tr(el.dataset.t); });
+  $$("[data-tp]").forEach(function(el){ el.placeholder = tr(el.dataset.tp); });
+  $("#projName").placeholder = tr("projName");
+  $$("#langBtns button").forEach(function(b){ b.classList.toggle("on", b.dataset.lang === lang); });
+  render();
+}
+function themePref(){ try{ var v = localStorage.getItem("gantt-theme-v4"); return /^(light|dark|system)$/.test(v) ? v : "system"; }catch(e){ return "system"; } }
+function applyTheme(){ var p = themePref(), mq = matchMedia("(prefers-color-scheme: dark)"); document.documentElement.dataset.theme = p === "system" ? (mq.matches ? "dark" : "light") : p; $$("#themeBtns button").forEach(function(b){ b.classList.toggle("on", b.dataset.th === p); }); }
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
+
+$("#tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(b){ view = b.dataset.v; render(); } });
+$("#langBtns").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; lang = b.dataset.lang; try{ localStorage.setItem("gantt-lang-v4", lang); }catch(x){} applyLang(); });
+$("#themeBtns").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; try{ localStorage.setItem("gantt-theme-v4", b.dataset.th); }catch(x){} applyTheme(); });
+["#q", "#fType", "#fWho"].forEach(function(s){ $(s).addEventListener("input", render); });
+$("#projName").addEventListener("change", function(){ S.name = this.value.trim(); save(); });
+$("#btnNew").onclick = function(){ openItem(null, view === "board" && activeSprint() ? { sprint:activeSprint().id } : null); };
+$("#iSave").onclick = saveItem; $("#sSave").onclick = saveSprint;
+$("#iDel").onclick = function(){ if(!editing || !confirm(tr("confirmDel"))) return; var id = editing.id; S.items = S.items.filter(function(x){ return x.id !== id; }); S.items.forEach(function(x){ if(x.epic === id) x.epic = ""; }); save(); closeDlg(); render(); };
+$("#sDel").onclick = function(){ if(!editingS || !confirm(tr("confirmDel"))) return; var id = editingS.id; S.sprints = S.sprints.filter(function(x){ return x.id !== id; }); S.items.forEach(function(x){ if(x.sprint === id) x.sprint = ""; }); save(); closeDlg(); render(); };
+$("#sStart").addEventListener("change", function(){ $("#sEnd").value = addWork(this.value, +$("#sLen").value || 10); });
+$("#sLen").addEventListener("input", function(){ if($("#sStart").value) $("#sEnd").value = addWork($("#sStart").value, +this.value || 1); });
+$("#sEnd").addEventListener("change", function(){ if($("#sStart").value) $("#sLen").value = workDays($("#sStart").value, this.value); });
+$$(".dlg").forEach(function(d){ d.addEventListener("click", function(e){ if(e.target === d || e.target.hasAttribute("data-close")) closeDlg(); }); });
+document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeDlg(); if(e.key === "Enter" && $("#dlgItem").classList.contains("on") && e.target.tagName !== "TEXTAREA"){ e.preventDefault(); saveItem(); } });
+document.addEventListener("click", function(e){
+  var t = e.target, el;
+  if((el = t.closest("#ddFile > .btn"))){ $("#ddFile").classList.toggle("open"); return; }
+  if(!t.closest("#ddFile")) $("#ddFile").classList.remove("open");
+  if((el = t.closest(".ddm [data-a]"))){
+    $("#ddFile").classList.remove("open"); var a = el.dataset.a;
+    if(a === "expJson") download(fname("json"), JSON.stringify(S, null, 2), "application/json");
+    else if(a === "expCsv") expCsv();
+    else if(a === "impJson" || a === "impCsv"){ var f = $("#fileIn"); f.dataset.kind = a; f.value = ""; f.click(); }
+    else if(a === "demo"){ if(!S.items.length || confirm(tr("confirmDemo"))) demo(); }
+    else if(a === "clear"){ if(confirm(tr("confirmClear"))){ S = blank(); save(); render(); } }
+    return;
+  }
+  if((el = t.closest("[data-open]"))){ e.preventDefault(); openItem(byId(el.dataset.open)); return; }
+  if((el = t.closest("[data-start]"))){ startSprint(el.dataset.start); return; }
+  if((el = t.closest("[data-complete]"))){ completeSprint(el.dataset.complete); return; }
+  if((el = t.closest("[data-edits]"))){ openSprint(sp(el.dataset.edits)); return; }
+  if(t.closest("#btnNewSprint")){ openSprint(null); return; }
+  if((el = t.closest("[data-push]"))){ push([byId(el.dataset.push)]); return; }
+  if(t.closest("#btnPushAll")){ push(epics()); return; }
+  if((el = t.closest("[data-wip]"))){ var v = prompt(tr("wip") + " · " + tr(el.dataset.wip), (S.wip || {})[el.dataset.wip] || ""); if(v !== null){ S.wip = S.wip || {}; S.wip[el.dataset.wip] = Math.max(0, parseInt(v, 10) || 0); save(); render(); } return; }
+  if((el = t.closest(".row[data-id],.card[data-id]"))){ openItem(byId(el.dataset.id)); return; }
+});
+document.addEventListener("change", function(e){ var s = e.target.closest("[data-link]"); if(!s) return; var ep = byId(s.dataset.link); ep.linkTask = s.value; save(); render(); });
+$("#fileIn").addEventListener("change", function(){
+  var f = this.files[0], kind = this.dataset.kind; if(!f) return;
+  var r = new FileReader(); r.onload = function(){
+    if(kind === "impCsv" || /\.csv$/i.test(f.name)) impCsv(String(r.result));
+    else { try{ var d = JSON.parse(r.result); if(d && Array.isArray(d.items)){ S = Object.assign(blank(), d); save(); $("#projName").value = S.name || ""; render(); toast(tr("imported", { n:S.items.length })); } }catch(x){ toast("JSON ✗"); } }
+  }; r.readAsText(f, "utf-8");
+});
+window.addEventListener("storage", function(e){
+  if(e.key === KEY){ load(); render(); }
+  else if(e.key === MAIN){ renderMs(); if(view === "epics") renderEpics(); }
+  else if(e.key === "gantt-workcal-v4" && W){ cal = W.load(); render(); }
+  else if(e.key === "gantt-theme-v4") applyTheme();
+});
+
+load(); $("#projName").value = S.name || ""; applyTheme(); applyLang();
+})();
+</script>
+<script src="../auth-gate.js"></script>
+</body>
+</html>
