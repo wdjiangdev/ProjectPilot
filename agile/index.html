@@ -28,7 +28,7 @@ header h1{font-size:14px;font-weight:600;white-space:nowrap}
 #projName:focus{outline:none;border-color:var(--accent);background:var(--card)}
 .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
 .bar input[type=search],.bar select{height:28px;border-radius:7px;border:.5px solid var(--m-bd);background:var(--m-ctl);padding:0 8px}
-#ms{font-size:12px;color:var(--tx2);padding:4px 10px;border-radius:7px;background:var(--m-seg)}
+#ms{font-size:12px;color:var(--tx2);padding:4px 10px;border-radius:7px;background:var(--m-seg);max-width:100%;min-width:0;overflow-wrap:anywhere}
 #ms b{color:var(--tx1)}#ms.late b{color:var(--c-bug)}
 main{padding:12px;overflow:auto;height:calc(100% - 48px - 45px)}
 .view{display:none}.view.on{display:block}
@@ -69,6 +69,9 @@ main{padding:12px;overflow:auto;height:calc(100% - 48px - 45px)}
 .card .ft{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .card .who{margin-left:auto;font-size:11px;color:var(--tx3)}
 .card.dragging,.row.dragging{opacity:.4}
+.mv{margin-left:4px;display:inline-flex;gap:2px;flex:none}
+.mv button{width:20px;height:20px;border-radius:5px;border:.5px solid var(--m-bd);background:var(--m-ctl);color:var(--tx2);cursor:pointer;font-size:13px;line-height:1;padding:0}
+.mv button:disabled{opacity:.3;cursor:default}
 /* reports & epics */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
@@ -103,6 +106,13 @@ table.ep select{max-width:240px;height:26px;border-radius:6px;border:.5px solid 
 .dd.open .ddm{display:flex}
 .ddm button{background:transparent;border:0;text-align:left;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px}
 .ddm button:hover{background:var(--accent);color:#fff}
+/* 顶栏在 ≤1024px 也换行：900px 宽时顶栏内容约 934px，固定 48px 高会横向溢出整页（横向滚动条、右侧内容被切） */
+@media (max-width:1024px){
+  header{height:auto;min-height:52px;flex-wrap:wrap;padding:6px 8px}
+  header h1{display:none}
+  #projName{width:140px}
+  main{height:auto}
+}
 @media (max-width:760px){
   header{height:auto;min-height:52px;flex-wrap:wrap;padding:6px 8px}
   header h1{display:none}
@@ -144,6 +154,7 @@ table.ep select{max-width:240px;height:26px;border-radius:6px;border:.5px solid 
   <input type="search" id="q" data-tp="search" placeholder="搜索">
   <select id="fType"><option value="" data-t="allTypes">全部类型</option><option value="story" data-t="story">故事</option><option value="task" data-t="task">任务</option><option value="bug" data-t="bug">缺陷</option></select>
   <select id="fWho"></select>
+  <select id="fSprint"></select>
   <span class="sp"></span>
   <span id="ms"></span>
 </div>
@@ -185,6 +196,12 @@ table.ep select{max-width:240px;height:26px;border-radius:6px;border:.5px solid 
   <div class="acts"><button class="btn del" id="sDel" data-t="del">删除</button><button class="btn" data-close data-t="cancel">取消</button><button class="btn pri" id="sSave" data-t="save">保存</button></div>
 </div></div>
 
+<div class="dlg" id="dlgCarry"><div class="box">
+  <h2 id="dcTitle"></h2>
+  <p id="dcText" style="font-size:13px;color:var(--tx2);line-height:1.5"></p>
+  <div class="acts" style="justify-content:flex-start;flex-wrap:wrap"><button class="btn pri" id="dcBacklog"></button><button class="btn pri" id="dcNext"></button><button class="btn" data-close data-t="cancel">取消</button></div>
+</div></div>
+
 <input type="file" id="fileIn" accept=".json,.csv" hidden>
 <div id="toast"></div>
 
@@ -209,7 +226,7 @@ var I18N = {
   newItem:"＋ 新建",search:"搜索",allTypes:"全部类型",allWho:"全部负责人",story:"故事",task:"任务",bug:"缺陷",epic:"史诗",projName:"填写项目名称",
   todo:"待办",doing:"进行中",review:"评审",done:"完成",highest:"最高",high:"高",medium:"中",low:"低",
   fTitle:"标题",fType:"类型",fStatus:"状态",fPts:"故事点",fPrio:"优先级",fWho:"负责人",fSprint:"冲刺",fEpic:"所属史诗",fLabels:"标签（逗号分隔）",fDesc:"描述",
-  del:"删除",cancel:"取消",save:"保存",none:"—",backlog:"产品待办",newSprint:"＋ 新建冲刺",startSprint:"开始冲刺",completeSprint:"完成冲刺",editSprint:"编辑",
+  del:"删除",cancel:"取消",save:"保存",none:"—",backlog:"产品待办",allSprints:"全部冲刺",newSprint:"＋ 新建冲刺",startSprint:"开始冲刺",completeSprint:"完成冲刺",editSprint:"编辑",
   planned:"计划中",active:"进行中",closed:"已完成",pts:"点",items:"项",cap:"容量",
   sName:"名称",sStart:"开始",sLen:"长度（工作日）",sEnd:"结束",sCap:"容量（点）",sGoal:"冲刺目标",newSprintT:"新建冲刺",editSprintT:"编辑冲刺",newItemT:"新建事项",editItemT:"编辑事项",
   noActive:"没有进行中的冲刺。到「待办」页开始一个冲刺。",dropHere:"拖到这里",emptyBacklog:"待办为空",
@@ -223,7 +240,7 @@ var I18N = {
   newItem:"＋ Create",search:"Search",allTypes:"All types",allWho:"All assignees",story:"Story",task:"Task",bug:"Bug",epic:"Epic",projName:"Project name",
   todo:"To Do",doing:"In Progress",review:"Review",done:"Done",highest:"Highest",high:"High",medium:"Medium",low:"Low",
   fTitle:"Summary",fType:"Type",fStatus:"Status",fPts:"Story points",fPrio:"Priority",fWho:"Assignee",fSprint:"Sprint",fEpic:"Epic",fLabels:"Labels (comma separated)",fDesc:"Description",
-  del:"Delete",cancel:"Cancel",save:"Save",none:"—",backlog:"Backlog",newSprint:"＋ Create sprint",startSprint:"Start sprint",completeSprint:"Complete sprint",editSprint:"Edit",
+  del:"Delete",cancel:"Cancel",save:"Save",none:"—",backlog:"Backlog",allSprints:"All sprints",newSprint:"＋ Create sprint",startSprint:"Start sprint",completeSprint:"Complete sprint",editSprint:"Edit",
   planned:"Planned",active:"Active",closed:"Closed",pts:"pts",items:"issues",cap:"Capacity",
   sName:"Name",sStart:"Start",sLen:"Length (workdays)",sEnd:"End",sCap:"Capacity (pts)",sGoal:"Sprint goal",newSprintT:"Create sprint",editSprintT:"Edit sprint",newItemT:"Create issue",editItemT:"Edit issue",
   noActive:"No active sprint. Start one from the Backlog.",dropHere:"Drop here",emptyBacklog:"Backlog is empty",
@@ -237,7 +254,7 @@ var I18N = {
   newItem:"＋ Erstellen",search:"Suchen",allTypes:"Alle Typen",allWho:"Alle Bearbeiter",story:"Story",task:"Aufgabe",bug:"Fehler",epic:"Epic",projName:"Projektname",
   todo:"Offen",doing:"In Arbeit",review:"Review",done:"Erledigt",highest:"Höchste",high:"Hoch",medium:"Mittel",low:"Niedrig",
   fTitle:"Titel",fType:"Typ",fStatus:"Status",fPts:"Story Points",fPrio:"Priorität",fWho:"Bearbeiter",fSprint:"Sprint",fEpic:"Epic",fLabels:"Labels (kommagetrennt)",fDesc:"Beschreibung",
-  del:"Löschen",cancel:"Abbrechen",save:"Speichern",none:"—",backlog:"Backlog",newSprint:"＋ Sprint erstellen",startSprint:"Sprint starten",completeSprint:"Sprint abschließen",editSprint:"Bearbeiten",
+  del:"Löschen",cancel:"Abbrechen",save:"Speichern",none:"—",backlog:"Backlog",allSprints:"Alle Sprints",newSprint:"＋ Sprint erstellen",startSprint:"Sprint starten",completeSprint:"Sprint abschließen",editSprint:"Bearbeiten",
   planned:"Geplant",active:"Aktiv",closed:"Abgeschlossen",pts:"P.",items:"Vorgänge",cap:"Kapazität",
   sName:"Name",sStart:"Start",sLen:"Länge (Arbeitstage)",sEnd:"Ende",sCap:"Kapazität (P.)",sGoal:"Sprintziel",newSprintT:"Sprint erstellen",editSprintT:"Sprint bearbeiten",newItemT:"Vorgang erstellen",editItemT:"Vorgang bearbeiten",
   noActive:"Kein aktiver Sprint. Im Backlog starten.",dropHere:"Hierher ziehen",emptyBacklog:"Backlog ist leer",
@@ -280,9 +297,10 @@ function setStatus(it, st){ if(it.status === st) return; it.status = st; it.done
 
 /* ===== 过滤 ===== */
 function passes(it){
-  var q = $("#q").value.trim().toLowerCase(), ft = $("#fType").value, fw = $("#fWho").value;
+  var q = $("#q").value.trim().toLowerCase(), ft = $("#fType").value, fw = $("#fWho").value, fs = $("#fSprint").value;
   if(ft && it.type !== ft) return false;
   if(fw && (it.who || "") !== fw) return false;
+  if(view === "backlog" && fs !== "__all" && (it.sprint || "") !== fs) return false; /* 冲刺筛选只用于待办页；看板只显示当前冲刺，不受它影响。"" = 只看产品待办，不能用 fs && 判断 */
   if(q && (it.key + " " + it.title + " " + (it.labels || []).join(" ")).toLowerCase().indexOf(q) < 0) return false;
   return true;
 }
@@ -293,7 +311,7 @@ var view = "backlog";
 function render(){
   $$("#tabs button").forEach(function(b){ b.classList.toggle("on", b.dataset.v === view); });
   $$(".view").forEach(function(v){ v.classList.toggle("on", v.id === "v-" + view); });
-  renderWho(); renderMs();
+  renderWho(); renderMs(); renderSprintFilter();
   if(view === "backlog") renderBacklog();
   else if(view === "board") renderBoard();
   else if(view === "reports") renderReports();
@@ -305,6 +323,12 @@ function renderWho(){
   var ks = Object.keys(names).sort();
   sel.innerHTML = '<option value="">' + esc(tr("allWho")) + "</option>" + ks.map(function(n){ return '<option' + (n === cur ? " selected" : "") + ">" + esc(n) + "</option>"; }).join("");
   $("#whoList").innerHTML = ks.map(function(n){ return '<option value="' + esc(n) + '">'; }).join("");
+}
+function renderSprintFilter(){
+  var sel = $("#fSprint"), cur = sel.options.length ? sel.value : "__all"; /* 值 "" = 只看产品待办，是合法选项，不能用 || "__all" 兜底，否则一切回全部 */
+  var opts = [["__all", tr("allSprints")], ["", tr("backlog")]].concat(S.sprints.map(function(s){ return [s.id, s.name]; }));
+  if(!opts.some(function(o){ return o[0] === cur; })) cur = "__all";
+  sel.innerHTML = opts.map(function(o){ return '<option value="' + esc(o[0]) + '"' + (o[0] === cur ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("");
 }
 function epicName(id){ var e = byId(id); return e ? e.title : ""; }
 function rowHtml(it){
@@ -344,9 +368,10 @@ function renderBoard(){
     var cs = its.filter(function(x){ return x.status === st; }), lim = (S.wip || {})[st] || 0, over = lim && cs.length > lim;
     return '<div class="col' + (over ? " over" : "") + '"><h4><span>' + esc(tr(st)) + " · " + cs.length + "</span>"
       + (st === "doing" || st === "review" ? '<span class="wip' + (over ? " over" : "") + '" data-wip="' + st + '" title="' + tr("wip") + '" style="cursor:pointer">' + (lim ? "≤" + lim : "WIP") + "</span>" : "<span>" + sumPts(cs) + " " + tr("pts") + "</span>") + "</h4>"
-      + '<div class="cards" data-st="' + st + '">' + cs.filter(passes).map(function(it){
+      + '<div class="cards" data-st="' + st + '">' + cs.filter(passes).map(function(it){ var si = STATUSES.indexOf(it.status);
         return '<div class="card" draggable="true" data-id="' + it.id + '"><div class="tt">' + esc(it.title) + '</div><div class="ft"><span class="ty ' + it.type + '">' + TYI[it.type] + '</span><span class="key" style="font-size:11px;color:var(--tx3)">' + esc(it.key) + "</span>"
-          + (it.epic ? '<span class="pill ep">' + esc(epicName(it.epic)) + "</span>" : "") + '<span class="pr">' + PICON[it.prio] + '</span><span class="pts">' + (it.pts || "–") + '</span><span class="who">' + esc(it.who || "") + "</span></div></div>";
+          + (it.epic ? '<span class="pill ep">' + esc(epicName(it.epic)) + "</span>" : "") + '<span class="pr">' + PICON[it.prio] + '</span><span class="pts">' + (it.pts || "–") + '</span><span class="who">' + esc(it.who || "") + "</span>"
+          + '<span class="mv"><button data-mv="-1"' + (si === 0 ? " disabled" : "") + ' title="' + esc(si > 0 ? tr(STATUSES[si - 1]) : "") + '">‹</button><button data-mv="1"' + (si === STATUSES.length - 1 ? " disabled" : "") + ' title="' + esc(si < STATUSES.length - 1 ? tr(STATUSES[si + 1]) : "") + '">›</button></span></div></div>';
       }).join("") + "</div></div>";
   }).join("") + "</div>";
   el.innerHTML = h;
@@ -356,7 +381,7 @@ function burnSvg(s){
   var its = work().filter(function(x){ return x.sprint === s.id; });
   var days = workList(s.start, s.end); if(!days.length) return "";
   var total = s.committed != null && s.state !== "planned" ? Math.max(s.committed, sumPts(its)) : sumPts(its);
-  var t = today(), Wd = 560, Hd = 220, L = 34, B = 24, T = 10, R = 10, n = days.length;
+  var t = today(), Wd = 560, Hd = 220, L = 34, B = 24, T = 10, R = 28, n = days.length; /* R=28：末尾日期标签（text-anchor middle）右沿 545 < 560，不再被 viewBox 裁切 */
   var x = function(i){ return L + (Wd - L - R) * (n === 1 ? 0 : i / (n - 1)); }, y = function(v){ return T + (Hd - T - B) * (1 - (total ? v / total : 0)); };
   var act = [];
   days.forEach(function(d, i){ if(d > t && s.state !== "closed") return; var done = sumPts(its.filter(function(x){ return x.status === "done" && x.doneAt && x.doneAt <= d; })); act.push(x(i).toFixed(1) + "," + y(total - done).toFixed(1)); });
@@ -423,7 +448,7 @@ function renderMs(){
   var nx = ms.find(function(x){ return x.start >= t; });
   if(!nx){ el.style.display = "none"; return; }
   el.style.display = ""; el.className = "";
-  el.innerHTML = tr("nextMs") + ": <b>" + esc(nx.name) + "</b> " + nx.start + " · " + tr("daysLeft", { n:Math.max(0, workDays(t, nx.start) - 1) });
+  el.innerHTML = tr("nextMs") + ": <b>" + esc(nx.name) + "</b> " + nx.start.slice(5) + " · " + tr("daysLeft", { n:Math.max(0, workDays(t, nx.start) - 1) });
 }
 
 /* ===== 对话框 ===== */
@@ -476,18 +501,29 @@ function startSprint(id){
   if(activeSprint()){ toast(tr("onlyOneActive")); return; }
   var s = sp(id); s.state = "active"; s.committed = sumPts(work().filter(function(x){ return x.sprint === id; })); save(); view = "board"; render();
 }
-function completeSprint(id){
-  var s = sp(id), its = work().filter(function(x){ return x.sprint === id; }), open = its.filter(function(x){ return x.status !== "done"; });
+/* 完成冲刺：未完成事项去向用对话框选，不用 prompt()（手机上 prompt 难用） */
+var carryId = null, carryNext = "";
+function openCarry(id){
+  var s = sp(id), open = work().filter(function(x){ return x.sprint === id && x.status !== "done"; });
   var next = S.sprints.find(function(x){ return x.state === "planned"; });
-  var dest = "";
-  if(open.length){
-    var msg = tr("carryOver", { n:open.length }) + "\n1 = " + tr("toBacklog") + (next ? "\n2 = " + tr("toNext") + " (" + next.name + ")" : "");
-    var a = prompt(msg, next ? "2" : "1"); if(a === null) return;
-    dest = a.trim() === "2" && next ? next.id : "";
-  }
+  carryId = id; carryNext = next ? next.id : "";
+  $("#dcTitle").textContent = s.name;
+  $("#dcText").textContent = tr("carryOver", { n:open.length });
+  $("#dcBacklog").textContent = tr("toBacklog");
+  var nb = $("#dcNext");
+  if(next){ nb.style.display = ""; nb.textContent = tr("toNext") + " (" + next.name + ")"; } else nb.style.display = "none";
+  $("#dlgCarry").classList.add("on");
+}
+function finishSprint(id, dest){
+  var s = sp(id), its = work().filter(function(x){ return x.sprint === id; }), open = its.filter(function(x){ return x.status !== "done"; });
   s.done = sumPts(its.filter(function(x){ return x.status === "done"; })); s.state = "closed"; s.closedAt = today();
   open.forEach(function(x){ x.sprint = dest; });
-  save(); view = "reports"; render();
+  save(); closeDlg(); view = "reports"; render();
+}
+function completeSprint(id){
+  var open = work().filter(function(x){ return x.sprint === id && x.status !== "done"; });
+  if(!open.length){ finishSprint(id, ""); return; }
+  openCarry(id);
 }
 
 /* ===== 拖放 ===== */
@@ -587,10 +623,11 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme
 $("#tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(b){ view = b.dataset.v; render(); } });
 $("#langBtns").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; lang = b.dataset.lang; try{ localStorage.setItem("gantt-lang-v4", lang); }catch(x){} applyLang(); });
 $("#themeBtns").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; try{ localStorage.setItem("gantt-theme-v4", b.dataset.th); }catch(x){} applyTheme(); });
-["#q", "#fType", "#fWho"].forEach(function(s){ $(s).addEventListener("input", render); });
+["#q", "#fType", "#fWho", "#fSprint"].forEach(function(s){ $(s).addEventListener("input", render); });
 $("#projName").addEventListener("change", function(){ S.name = this.value.trim(); save(); });
 $("#btnNew").onclick = function(){ openItem(null, view === "board" && activeSprint() ? { sprint:activeSprint().id } : null); };
 $("#iSave").onclick = saveItem; $("#sSave").onclick = saveSprint;
+$("#dcBacklog").onclick = function(){ finishSprint(carryId, ""); }; $("#dcNext").onclick = function(){ finishSprint(carryId, carryNext); };
 $("#iDel").onclick = function(){ if(!editing || !confirm(tr("confirmDel"))) return; var id = editing.id; S.items = S.items.filter(function(x){ return x.id !== id; }); S.items.forEach(function(x){ if(x.epic === id) x.epic = ""; }); save(); closeDlg(); render(); };
 $("#sDel").onclick = function(){ if(!editingS || !confirm(tr("confirmDel"))) return; var id = editingS.id; S.sprints = S.sprints.filter(function(x){ return x.id !== id; }); S.items.forEach(function(x){ if(x.sprint === id) x.sprint = ""; }); save(); closeDlg(); render(); };
 $("#sStart").addEventListener("change", function(){ $("#sEnd").value = addWork(this.value, +$("#sLen").value || 10); });
@@ -619,6 +656,7 @@ document.addEventListener("click", function(e){
   if((el = t.closest("[data-push]"))){ push([byId(el.dataset.push)]); return; }
   if(t.closest("#btnPushAll")){ push(epics()); return; }
   if((el = t.closest("[data-wip]"))){ var v = prompt(tr("wip") + " · " + tr(el.dataset.wip), (S.wip || {})[el.dataset.wip] || ""); if(v !== null){ S.wip = S.wip || {}; S.wip[el.dataset.wip] = Math.max(0, parseInt(v, 10) || 0); save(); render(); } return; }
+  if((el = t.closest("[data-mv]"))){ var cd = el.closest("[data-id]"); if(cd){ var mv = byId(cd.dataset.id), mi = STATUSES.indexOf(mv.status) + (+el.dataset.mv); if(mi >= 0 && mi < STATUSES.length){ setStatus(mv, STATUSES[mi]); save(); render(); } } return; }
   if((el = t.closest(".row[data-id],.card[data-id]"))){ openItem(byId(el.dataset.id)); return; }
 });
 document.addEventListener("change", function(e){ var s = e.target.closest("[data-link]"); if(!s) return; var ep = byId(s.dataset.link); ep.linkTask = s.value; save(); render(); });
