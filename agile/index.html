@@ -347,12 +347,14 @@ function renderBacklog(){
   var h = "";
   S.sprints.filter(function(s){ return s.state !== "closed"; }).forEach(function(s){
     var its = work().filter(function(x){ return x.sprint === s.id; }).sort(byRank), pts = sumPts(its);
+    var vis = its.filter(passes);
+    if($("#fSprint").value !== "__all" && !vis.length) return; /* 按冲刺筛选时筛空的冲刺区整个隐藏，只留表头会显得像坏了；不过滤时留空区作拖放目标 */
     var capCls = s.cap && pts > s.cap ? " over" : "";
     h += '<div class="sec"><div class="sech"><h3>' + esc(s.name) + '</h3><span class="pill">' + esc(tr(s.state)) + '</span><span class="meta">' + esc(sprintMeta(s)) + "</span>"
       + '<span class="sp" style="flex:1"></span><span class="cap' + capCls + '">' + pts + (s.cap ? " / " + s.cap : "") + " " + tr("pts") + " · " + its.length + " " + tr("items") + "</span>"
       + (s.state === "planned" ? '<button class="btn sm" data-start="' + s.id + '">' + tr("startSprint") + "</button>" : '<button class="btn sm pri" data-complete="' + s.id + '">' + tr("completeSprint") + "</button>")
       + '<button class="btn sm" data-edits="' + s.id + '">' + tr("editSprint") + "</button></div>"
-      + '<div class="list" data-drop="' + s.id + '">' + (its.filter(passes).map(rowHtml).join("") || '<div class="empty">' + tr("dropHere") + "</div>") + "</div></div>";
+      + '<div class="list" data-drop="' + s.id + '">' + (vis.map(rowHtml).join("") || '<div class="empty">' + tr("dropHere") + "</div>") + "</div></div>";
   });
   var bl = work().filter(function(x){ return !x.sprint || (sp(x.sprint) || {}).state === "closed" && x.status !== "done"; }).sort(byRank);
   h += '<div class="sec"><div class="sech"><h3>' + tr("backlog") + '</h3><span class="meta">' + sumPts(bl) + " " + tr("pts") + " · " + bl.length + " " + tr("items") + '</span><span style="flex:1"></span><button class="btn sm" id="btnNewSprint">' + tr("newSprint") + "</button></div>"
