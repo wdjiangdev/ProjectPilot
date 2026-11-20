@@ -118,10 +118,10 @@ header button:hover{background:var(--steel3)}
 #fmtBar .fm-c input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:0}
 #fmtBar.dis{opacity:.55}
 #mspBar{display:inline-flex;align-items:center;gap:4px}#mspBar>button,.toolbar .ms-link,.toolbar .ms-unlink{padding:5px 8px}
-.ms-pct{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
-.ms-pct button{border:0;border-radius:0;padding:4px 6px;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:30px}
+.ms-pct{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ms-pct button{border:0;border-radius:0;padding:4px 6px;font-size:10px;line-height:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:30px}
 .ms-pct button+button{border-left:1px solid var(--line)}
-.ms-pct i{display:block;width:18px;height:5px;border:1px solid #64748b;border-radius:1px;background:linear-gradient(90deg,#1e3a8a calc(var(--p)*1%),transparent 0)}
+.ms-pct i{display:block;width:18px;height:5px;border:1px solid #64748b;border-radius:1px;background:linear-gradient(90deg,#1e3a8a calc(var(--p)*1%),transparent 0);flex-shrink:0}
 .trow.drop-b{box-shadow:inset 0 2px 0 var(--accent)}.trow.drop-a{box-shadow:inset 0 -2px 0 var(--accent)}
 body.row-dragging,body.row-dragging *{cursor:grabbing!important;user-select:none}
 .trow .c-id{cursor:grab}
@@ -472,7 +472,7 @@ label.v4gb{display:flex;align-items:center;gap:6px}label.v4gb select{height:24px
 /* 顶部栏控件统一高度 32px（与 v3 根页一致）（新建项目 / 项目名称 / OEM 链接 / 主题 / 语言） */
 header button,header input,header select,header a.btn,header #lnkOem,header #themeBtns{height:32px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle}
 header input{display:inline-block}
-.toolbar #fltTxt{height:28px;box-sizing:border-box}.toolbar .ms-pct{height:28px;box-sizing:border-box}
+.toolbar #fltTxt{height:28px;box-sizing:border-box;font-size:13px;line-height:22px}.toolbar .ms-pct{height:28px;box-sizing:border-box}
 header #themeBtns{display:flex}header #themeBtns button{height:100%;padding:0 9px}
 /* v4.3 功能区 Ribbon */
 .toolbar.ribbon{display:block;padding:0;gap:0}
