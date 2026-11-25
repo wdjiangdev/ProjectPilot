@@ -2,6 +2,7 @@
 
 ## English
 
+- 2026-11-25: OEM page: the template milestones in the Gantt chart are now optional, like the phase bands — the legend's Milestone entry is a checkbox (on by default); unticking it hides the whole milestone row (diamonds, labels and dates) and collapses its height, and the choice is saved with the project, kept in JSON export/import, and honoured in the PDF/JPG export legend.
 - 2026-11-20: New Agile page (Agile ↗ in the main header): Jira-style backlog with epics/stories/tasks/bugs, story points and priorities; sprint planning on working days (Chinese holidays respected) with capacity; Kanban board with drag-and-drop and WIP limits; burndown and velocity charts; JSON and Jira CSV import/export. Epics can be linked to a Gantt task and push their progress (done points ÷ total) back as % complete. Data is stored separately from the Gantt and OEM pages.
 - 2026-11-20: Agile fixes and additions: the burndown chart's last date label is no longer clipped, and the header and next-milestone banner no longer overflow on narrower windows; board cards now have ‹ › buttons to move issues between columns (works on touch screens), completing a sprint now asks in a dialog where to move open issues instead of a prompt, and the toolbar can filter the backlog by sprint. The burndown and velocity legends now sit in a strip above their charts instead of inside the plot area.
 - 2026-11-20: Ribbon alignment: the search box text is now vertically centered (standard 13px font, line height matched to the box), and the completion % buttons (0/25/50/75/100) are centered — the little bars no longer squash and the numbers sit in the middle of their cells.
@@ -21,6 +22,7 @@
 
 ## 中文
 
+- 2026-11-25：OEM 页：甘特图里模板自带的里程碑改成可选项，跟阶段区间一样——图例里的「里程碑」改成勾选框（默认勾选）；取消勾选后整条里程碑行（菱形、名称、日期）隐藏并收起高度，选择随项目保存，JSON 导出/导入保留，PDF/JPG 导出图例里也不再出现。
 - 2026-11-20：新增敏捷页（主页面顶栏「Agile ↗」）：Jira 风格待办（史诗/故事/任务/缺陷、故事点、优先级）；按工作日（含中国节假日）规划冲刺并显示容量；看板拖动换状态、WIP 上限；燃尽图与速度图；JSON 与 Jira CSV 导入导出。史诗可关联甘特图任务，把进度（已完成点数 ÷ 总点数）回写成完成百分比。数据与甘特图、OEM 页分开保存
 - 2026-11-20：敏捷页修补与加功能：燃尽图末尾日期标签不再被裁切，顶栏与客户节点横幅在较窄窗口下不再溢出；看板卡片加了 ‹ › 按钮可直接移列（触屏也能用），完成冲刺改用对话框选未完成事项去向（不再弹 prompt），工具栏可按冲刺筛选待办。燃尽图与速度图的图例移到图表上方单独一行，不再压在图表区里。
 - 2026-11-20：功能区对齐：搜索框里的文字现在上下居中（字号统一为 13px、行高按框高给），完成比例按钮（0/25/50/75/100）也居中了——小横条不再被压扁，数字落在格子正中
@@ -40,6 +42,7 @@
 
 ## Deutsch
 
+- 2026-11-25: OEM-Seite: Die Meilensteine der Vorlage im Gantt-Diagramm sind jetzt optional, wie die Phasenbänder — der Legenden-Eintrag „Meilenstein“ ist ein Kontrollkästchen (standardmäßig aktiviert); bei deaktiviertem Kästchen wird die gesamte Meilensteinzeile (Rauten, Beschriftungen und Daten) ausgeblendet und eingeklappt; die Auswahl wird mit dem Projekt gespeichert, in JSON-Export/Import übernommen und in der Legende des PDF-/JPG-Exports berücksichtigt.
 - 2026-11-20: Neue Agile-Seite („Agile ↗" in der Kopfzeile): Backlog im Jira-Stil mit Epics/Stories/Aufgaben/Fehlern, Story Points und Prioritäten; Sprintplanung nach Arbeitstagen (chinesische Feiertage berücksichtigt) mit Kapazität; Kanban-Board mit Drag-and-drop und WIP-Limits; Burndown- und Velocity-Diagramm; Import/Export als JSON und Jira-CSV. Epics lassen sich mit einem Gantt-Vorgang verknüpfen und übertragen ihren Fortschritt (erledigte ÷ gesamte Punkte) als % abgeschlossen. Daten getrennt von Gantt- und OEM-Seite gespeichert.
 - 2026-11-20: Agile-Korrekturen und Ergänzungen: Das letzte Datumslabel im Burndown wird nicht mehr abgeschnitten, Kopfzeile und Meilenstein-Banner laufen in schmaleren Fenstern nicht mehr über; Board-Karten haben ‹ ›-Schaltflächen zum Verschieben zwischen Spalten (auch auf Touchscreens), das Abschließen eines Sprints fragt jetzt in einem Dialog statt per Prompt, wohin offene Vorgänge sollen, und die Toolbar kann das Backlog nach Sprint filtern. Die Legenden von Burndown und Geschwindigkeit stehen jetzt in einer eigenen Zeile über dem Diagramm statt im Plotbereich.
 - 2026-11-20: Ausrichtung im Menüband: Der Text im Suchfeld ist jetzt vertikal zentriert (Standardschrift 13 px, Zeilenhöhe an die Feldhöhe angepasst), und die Prozent-Schaltflächen (0/25/50/75/100) sind zentriert — die kleinen Balken werden nicht mehr gestaucht, die Zahlen sitzen in der Mitte ihrer Zellen.

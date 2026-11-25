@@ -436,7 +436,7 @@ html[data-theme=dark] #chart rect[fill="#dbeafe"]{fill:#1e3350}html[data-theme=d
   </aside>
   <main>
     <div class="legend">
-      <span><span class="dot" style="background:#dc2626;transform:rotate(45deg)"></span><span data-i18n="legendMs">里程碑</span></span>
+      <span><label style="cursor:pointer;display:inline-flex;align-items:center;gap:5px"><input type="checkbox" id="ckMs" checked style="accent-color:#dc2626;margin:0"><span class="dot" style="background:#dc2626;transform:rotate(45deg)"></span><span data-i18n="legendMs">里程碑</span></label></span>
       <span><label style="cursor:pointer;display:inline-flex;align-items:center;gap:5px"><input type="checkbox" id="ckPhase" checked style="accent-color:#60a5fa;margin:0"><span class="dot" style="background:#bfdbfe;border:1px solid #60a5fa"></span><span data-i18n="legendPhase">阶段区间</span></label></span>
       <span><span class="dot" style="background:#60a5fa"></span><span data-i18n="legendRec">推荐任务</span></span>
       <span><span class="dot" style="background:#14b8a6"></span><span data-i18n="legendCustom">自定义任务</span></span>
@@ -691,13 +691,13 @@ function buildOemOptions(){
   sel.value = state.oem || '';
 }
 
-var state = { oem:'', projectName:'', dates:{}, tasks:[], excluded:{}, recTasks:{}, customMs:[], addNodes:{}, showPhase:true, gutW:0, msRowH:0, cmRowH:0, logoLeft:'', logoRight:'' };
+var state = { oem:'', projectName:'', dates:{}, tasks:[], excluded:{}, recTasks:{}, customMs:[], addNodes:{}, showPhase:true, showMs:true, gutW:0, msRowH:0, cmRowH:0, logoLeft:'', logoRight:'' };
 var LS_KEY = 'gantt-tool-v1';
 function save(){
   try{
     var data = { oem:state.oem, projectName:state.projectName, dates:state.dates,
       excluded:state.excluded, recTasks:state.recTasks, tasks:state.tasks,
-      customMs:state.customMs, addNodes:state.addNodes || {}, showPhase:state.showPhase !== false,
+      customMs:state.customMs, addNodes:state.addNodes || {}, showPhase:state.showPhase !== false, showMs:state.showMs !== false,
       gutW:state.gutW || 0, msRowH:state.msRowH || 0, cmRowH:state.cmRowH || 0,
       logoLeft:state.logoLeft || '', logoRight:state.logoRight || '',
       creatorName:$('creatorName') ? $('creatorName').value : '',
@@ -736,6 +736,7 @@ function load(){
     if(Array.isArray(d.customMs)) state.customMs = d.customMs;
     if(d.addNodes && typeof d.addNodes === 'object') state.addNodes = d.addNodes;
     if(typeof d.showPhase === 'boolean') state.showPhase = d.showPhase;
+    if(typeof d.showMs === 'boolean') state.showMs = d.showMs;
     state.gutW = +d.gutW > 0 ? +d.gutW : 0; state.msRowH = +d.msRowH > 0 ? +d.msRowH : 0; state.cmRowH = +d.cmRowH > 0 ? +d.cmRowH : 0;
     if(typeof d.logoLeft === 'string') state.logoLeft = d.logoLeft;
     if(typeof d.logoRight === 'string') state.logoRight = d.logoRight;
@@ -1418,7 +1419,8 @@ function _renderChart(_padR, _minAng){
     return { name:l.name || '', dates:ds, cust:!!l.cust, bg:!!l.cust && !l.noBg, src:li, h:+l.h > 0 ? Math.round(Math.max(40, Math.min(300, +l.h))) : 0 };
   }).filter(function(l){ return l.dates.length; });
 
-  if(!ms.length && !tasks.length && !recBars.length && !cmLanes.length){
+  var showMs = state.showMs !== false;
+  if((!showMs || !ms.length) && !tasks.length && !recBars.length && !cmLanes.length){
     chart.innerHTML = ''; empty.style.display = 'block'; return;
   }
   empty.style.display = 'none';
@@ -1461,12 +1463,12 @@ function _renderChart(_padR, _minAng){
   var MS_NEED = Math.ceil(12 / Math.sin(MS_ANG * Math.PI / 180));
   var _msMaxW = 0; ms.forEach(function(m){ _msMaxW = Math.max(_msMaxW, textW(abbr(m.name))); });
   var _labH = _msMaxW * Math.sin(MS_ANG * Math.PI / 180);
-  var AXIS_H = 44, PH_Y = 44, PH_H = showPH ? 48 : 0, MS_Y = PH_Y + PH_H, MS_H = Math.round(Math.max(72, Math.min(170, _labH + 58)));
+  var AXIS_H = 44, PH_Y = 44, PH_H = showPH ? 48 : 0, MS_Y = PH_Y + PH_H, MS_H = showMs ? Math.round(Math.max(72, Math.min(170, _labH + 58))) : 0;
   window._autoMsH = MS_H;
-  if(state.msRowH > 0){ MS_H = Math.round(Math.max(40, Math.min(400, state.msRowH))); MS_Y = PH_Y + PH_H; }
+  if(showMs && state.msRowH > 0){ MS_H = Math.round(Math.max(40, Math.min(400, state.msRowH))); MS_Y = PH_Y + PH_H; }
   /* 用户 2026-10-15：标签倾角随行高自动变化（10°–75°）；名字永远完整显示，不伸进顶部年份/月份——行高不够放下全名时，行高自动抬到最低所需值 */
   var _rad = function(a){ return a * Math.PI / 180; }, _labH2 = function(a){ return _msMaxW * Math.sin(_rad(a)) + 9 * Math.cos(_rad(a)); };
-  if(_msMaxW > 0){
+  if(showMs && _msMaxW > 0){
     var _needMin = Math.ceil(_labH2(_minAng)) + 52;
     if(MS_H < _needMin) MS_H = _needMin;
     var _a = _minAng; for(var _t = 75; _t >= _minAng; _t--){ if(_labH2(_t) <= MS_H - 52){ _a = _t; break; } }
@@ -1552,8 +1554,10 @@ function _renderChart(_padR, _minAng){
       s += '<text x="' + (GUT/2).toFixed(1) + '" y="' + (PH_Y + PH_H/2 + 4) + '" text-anchor="middle" font-size="13" fill="#1f2937">VDA-MLA</text>';
     } else s += '<text x="12" y="' + (PH_Y + PH_H/2 + 4) + '" class="glabel">' + esc(tr('legendPhase') + ' · ' + PHASE_SYSTEMS[sys].tag) + '</text>';
   }
-  s += '<rect x="0" y="' + MS_Y + '" width="' + W + '" height="' + MS_H + '" fill="#a0a0a0"/>';
-  s += '<text x="' + (GUT/2).toFixed(1) + '" y="' + (MS_Y + MS_H/2 + 4) + '" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">' + esc(tr('legendMs')) + '</text>';
+  if(showMs){
+    s += '<rect x="0" y="' + MS_Y + '" width="' + W + '" height="' + MS_H + '" fill="#a0a0a0"/>';
+    s += '<text x="' + (GUT/2).toFixed(1) + '" y="' + (MS_Y + MS_H/2 + 4) + '" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">' + esc(tr('legendMs')) + '</text>';
+  }
   s += '<line x1="0" y1="' + CM_Y + '" x2="' + W + '" y2="' + CM_Y + '" stroke="#e5e7eb"/>';
   cmLanes.forEach(function(l, i){
     var ly0 = CM_YS[i];
@@ -1572,7 +1576,8 @@ function _renderChart(_padR, _minAng){
   s += '<line x1="' + GUT + '" y1="0" x2="' + GUT + '" y2="' + H + '" stroke="#e5e7eb"/>';
   s += '<line x1="' + GUT + '" y1="0" x2="' + GUT + '" y2="' + H + '" stroke="#e5e7eb"/>';
 
-  // 里程碑基线
+  // 里程碑基线：可隐藏（ckMs）
+  if(showMs){
   if(ms.length > 1){
     s += '<line x1="' + X(ms[0].d).toFixed(1) + '" y1="' + msCY + '" x2="' + X(ms[ms.length-1].d).toFixed(1) + '" y2="' + msCY + '" stroke="#fcd34d" stroke-width="3"/>';
   }
@@ -1614,6 +1619,7 @@ function _renderChart(_padR, _minAng){
       + '<text x="' + cx.toFixed(1) + '" y="' + (msCY+21+(msDateRow[idx]?11:0)) + '" text-anchor="middle" fill="#1f2937" font-size="10">' + (m.d.getMonth()+1) + '/' + m.d.getDate() + '</text>'
       + '</g>';
   });
+  }
   // 自定义节点排：基线 + 菱形 + 日期（上方）+ 名称（下方）；标签重叠时自动错开
   cmLanes.forEach(function(l, i){
     var y0 = CM_YS[i], cy = y0 + l.hh/2, r = 6;
@@ -1684,7 +1690,7 @@ function _renderChart(_padR, _minAng){
   }
 
   /* 手动调整：左列宽（竖线）与里程碑行高（横线）拖动手柄；导出时移除 */
-  s += '<rect class="rz-h rz-ms" data-noexp="1" x="0" y="' + (MS_Y + MS_H - 4) + '" width="' + W + '" height="8" fill="transparent" style="cursor:row-resize"><title>' + esc(tr('rzMsTip')) + '</title></rect>';
+  if(showMs) s += '<rect class="rz-h rz-ms" data-noexp="1" x="0" y="' + (MS_Y + MS_H - 4) + '" width="' + W + '" height="8" fill="transparent" style="cursor:row-resize"><title>' + esc(tr('rzMsTip')) + '</title></rect>';
   cmLanes.forEach(function(l, i){ s += '<rect class="rz-h rz-cm" data-noexp="1" data-lane="' + l.src + '" data-h="' + l.hh + '" x="' + GUT + '" y="' + (CM_YS[i + 1] - 3) + '" width="' + (W - GUT) + '" height="6" fill="transparent" style="cursor:row-resize"><title>' + esc(tr('rzCmTip')) + '</title></rect>'; });
   s += '<rect class="rz-h rz-gut" data-noexp="1" x="' + (GUT - 4) + '" y="0" width="8" height="' + H + '" fill="transparent" style="cursor:col-resize"><title>' + esc(tr('rzGutTip')) + '</title></rect>';
   window._curGut = GUT; window._curMsH = MS_H; window._curCmH = CM_H; window._chartMap = { min:min, pxDay:pxDay };
@@ -1769,10 +1775,11 @@ function exportScale(cssW, cssH){
   return s;
 }
 function drawExportLegend(ctx, w, y0){
-  var items = [
-    {c:'#dc2626', t:tr('legendMs'), diamond:true}
-  ];
-  /* Phase 只在显示时才出现在图例中 */
+  var items = [];
+  /* 里程碑 / Phase 只在显示时才出现在图例中 */
+  if(state.showMs !== false){
+    items.push({c:'#dc2626', t:tr('legendMs'), diamond:true});
+  }
   if(state.showPhase !== false){
     items.push({c:'#bfdbfe', t:tr('legendPhase')});
   }
@@ -1956,7 +1963,7 @@ function closePreview(){
 function exportJSON(){
   var data = { app:'gantt-tool', v:1, oem:state.oem, projectName:state.projectName,
     dates:state.dates, excluded:state.excluded, recTasks:state.recTasks,
-    tasks:state.tasks, customMs:state.customMs, addNodes:state.addNodes || {}, showPhase:state.showPhase !== false,
+    tasks:state.tasks, customMs:state.customMs, addNodes:state.addNodes || {}, showPhase:state.showPhase !== false, showMs:state.showMs !== false,
     gutW:state.gutW || 0, msRowH:state.msRowH || 0, cmRowH:state.cmRowH || 0,
     logoLeft:state.logoLeft || '', logoRight:state.logoRight || '',
     creatorName:$('creatorName') ? $('creatorName').value : '',
@@ -1980,6 +1987,7 @@ function importJSON(file){
       state.customMs = Array.isArray(d.customMs) ? d.customMs : [];
       state.addNodes = (d.addNodes && typeof d.addNodes === 'object') ? d.addNodes : {};
       state.showPhase = d.showPhase !== false;
+      state.showMs = d.showMs !== false;
       state.gutW = +d.gutW > 0 ? +d.gutW : 0; state.msRowH = +d.msRowH > 0 ? +d.msRowH : 0; state.cmRowH = +d.cmRowH > 0 ? +d.cmRowH : 0;
       if(window.syncSizeInputs) syncSizeInputs();
       state.logoLeft = (typeof d.logoLeft === 'string') ? d.logoLeft : '';
@@ -2009,6 +2017,7 @@ function importJSON(file){
       $('oemSelect').value = state.oem;
       $('projectName').value = state.projectName;
       $('ckPhase').checked = state.showPhase;
+      $('ckMs').checked = state.showMs;
       save(); renderAll();
       toast(tr('toastJSONOk'));
     }catch(e){ toast(tr('toastJSONBad')); }
@@ -2101,6 +2110,7 @@ function init(){
   buildOemOptions();
   $('projectName').value = state.projectName || '';
   $('ckPhase').checked = state.showPhase !== false;
+  $('ckMs').checked = state.showMs !== false;
   if(state._ui){
     if(typeof state._ui.creatorName === 'string') $('creatorName').value = state._ui.creatorName;
     $('ckShowCreator').checked = !!state._ui.ckShowCreator;
@@ -2118,6 +2128,10 @@ function init(){
   }
   $('ckPhase').addEventListener('change', function(){
     state.showPhase = this.checked;
+    save(); renderChart();
+  });
+  $('ckMs').addEventListener('change', function(){
+    state.showMs = this.checked;
     save(); renderChart();
   });
   /* 左列宽 / 里程碑行高：输入数值或在图上拖动；留空或「自动」= 自适应 */
